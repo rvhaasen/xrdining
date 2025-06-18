@@ -1,0 +1,52 @@
+# Xcode & macOS
+*.xcuserstate
+*.xcscmblueprint
+*.xccheckout
+*.xcodeproj/project.xcworkspace/xcuserdata
+*.xcodeproj/xcuserdata
+*.xcworkspace/xcuserdata
+*.xcworkspace/xcshareddata/WorkspaceSettings.xcsettings
+
+# Derived data
+DerivedData/
+build/
+
+# Swift Package Manager
+.build/
+Packages/
+Package.pins
+Package.resolved
+
+# CocoaPods
+Pods/
+Podfile.lock
+
+# Carthage
+Carthage/Build/
+
+# Fastlane
+fastlane/report.xml
+fastlane/screenshots/
+fastlane/test_output/
+
+# Archives
+*.xcarchive
+
+# Personal user data
+*.DS_Store
+*.swp
+*.swo
+
+# Playground stuff
+timeline.xctimeline
+playground.xcworkspace
+
+# Symbolicated crash logs
+*.dSYM.zip
+*.dSYM
+
+# Xcode Preview canvas cache
+*.canvas
+
+# Video files
+**/videos/
