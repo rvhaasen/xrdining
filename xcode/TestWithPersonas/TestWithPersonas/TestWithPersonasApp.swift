@@ -10,24 +10,21 @@ import SwiftUI
 @main
 struct TestWithPersonasApp: App {
 
-    @State private var appModel = AppModel()
+    @State var appModel = AppModel()
 
     var body: some Scene {
-        WindowGroup {
-            ContentView()
-                .environment(appModel)
+        Group {
+            TestWithPersonasWindow()
+            ImmersiveSpace(id: appModel.immersiveSpaceID) {
+                ImmersiveView()
+                    .onAppear {
+                        appModel.immersiveSpaceState = .open
+                    }
+                    .onDisappear {
+                        appModel.immersiveSpaceState = .closed
+                    }
+            }
         }
-
-        ImmersiveSpace(id: appModel.immersiveSpaceID) {
-            ImmersiveView()
-                .environment(appModel)
-                .onAppear {
-                    appModel.immersiveSpaceState = .open
-                }
-                .onDisappear {
-                    appModel.immersiveSpaceState = .closed
-                }
-        }
-//        .immersionStyle(selection: .constant(.mixed), in: .mixed)
+        .environment(appModel)
      }
 }
