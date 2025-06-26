@@ -12,8 +12,8 @@ struct TestWithPersonasWindow : Scene {
     
     var body: some Scene {
         WindowGroup {
-                MainView()    
-//            .frame(width: 900, height: 600)
+            MainView()
+            .frame(width: 900, height: 600)
         }
         .windowResizability(.contentSize)
     }

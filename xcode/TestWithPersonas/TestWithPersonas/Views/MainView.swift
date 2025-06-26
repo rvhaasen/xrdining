@@ -15,11 +15,7 @@ struct MainView: View {
     @Environment(AppModel.self) var appModel
     
     var body: some View {
-        Group {
-            //if appModel.immersiveSpaceState == .closed {
-                ContentView()
-            //}
-        }
+        ContentView()
         .task(observeGroupSessions)
     }
     @Sendable

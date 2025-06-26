@@ -18,8 +18,12 @@ struct ImmersiveView: View {
         let videoURL = Bundle.main.url(forResource: "philips-visvijver", withExtension: "mp4")!
         let player = AVPlayer(url: videoURL)
         let videoMaterial = VideoMaterial(avPlayer: player)
-
+        
         RealityView { content in
+            //appModel.sessionController?.gameStateChanged()
+            guard appModel.selectedWorld != "" else {
+                return
+            }
             player.actionAtItemEnd = .none
             NotificationCenter.default.addObserver(
                 forName: .AVPlayerItemDidPlayToEndTime,
@@ -53,3 +57,4 @@ struct ImmersiveView: View {
 //    ImmersiveView()
 //        .environment(AppModel())
 //}
+

@@ -9,16 +9,30 @@
 import SwiftUI
 import RealityKit
 import RealityKitContent
-//internal import Combine
-
 
 struct ContentView: View {
     @Environment(AppModel.self) var appModel
     var body: some View {
+        @Bindable var appModel = appModel
         VStack {
             WelcomeBanner().offset(y: 20)
 //            Model3D(named: "Scene", bundle: realityKitContentBundle)
 //                .padding(.bottom, 50)
+            
+            // A Picker for selecting a world
+            HStack{
+                Text("Select an environment:").font(.headline)
+                Picker("Worlds", selection: $appModel.selectedWorld) {
+                    ForEach(appModel.worlds, id: \.self) { world in
+                        Text(world)
+                    }
+                }
+                Button("clear selection", action: { appModel.selectedWorld = ""})
+            }
+
+            
+                
+            
             ToggleImmersiveSpaceButton()
             Divider()
             

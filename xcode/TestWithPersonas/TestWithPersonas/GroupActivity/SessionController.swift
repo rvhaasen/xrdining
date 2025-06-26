@@ -13,6 +13,28 @@ final class SessionController {
     let messenger: GroupSessionMessenger
     let systemCoordinator: SystemCoordinator
     
+    var players = [Participant: PlayerModel]()
+//    {
+//        didSet {
+//            if oldValue != players {
+//                updateCurrentPlayer()
+//                updateLocalParticipantRole()
+//            }
+//        }
+//    }
+    var localPlayer: PlayerModel {
+        get {
+            players[session.localParticipant]!
+        }
+        set {
+            if newValue != players[session.localParticipant] {
+                players[session.localParticipant] = newValue
+                //shareLocalPlayerState(newValue)
+            }
+        }
+    }
+ 
+
     init?(_ groupSession: GroupSession<PersonasActivity>, appModel: AppModel) async {
         guard let groupSystemCoordinator = await groupSession.systemCoordinator else {
             return nil
@@ -22,7 +44,20 @@ final class SessionController {
         messenger = GroupSessionMessenger(session: session)
 
         systemCoordinator = groupSystemCoordinator
-
+        updateSpatialTemplatePreference()
+        
+        observeRemoteParticipantUpdates()
+        configureSystemCoordinator()
         session.join()
+    }
+    func updateSpatialTemplatePreference() {
+        systemCoordinator.configuration.spatialTemplatePreference = .custom(DiningTemplate())
+    }
+    func configureSystemCoordinator() {
+        // Let the system coordinator show each players' spatial Persona in the immersive space.
+        systemCoordinator.configuration.supportsGroupImmersiveSpace = true
+    }
+    func gameStateChanged() {
+        updateSpatialTemplatePreference()
     }
 }
