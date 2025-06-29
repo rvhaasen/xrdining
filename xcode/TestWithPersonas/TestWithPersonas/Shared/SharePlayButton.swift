@@ -11,6 +11,8 @@ import SwiftUI
 import UIKit
 
 struct SharePlayButton<ActivityType: GroupActivity & Transferable & Sendable>: View {
+    @Environment(AppModel.self) var appModel
+    
     @ObservedObject
     private var groupStateObserver = GroupStateObserver()
     
@@ -37,31 +39,34 @@ struct SharePlayButton<ActivityType: GroupActivity & Transferable & Sendable>: V
         ZStack {
             ShareLink(item: activity, preview: SharePreview(text)).hidden()
             
-            Button(text, systemImage: "shareplay") {
-                if groupStateObserver.isEligibleForGroupSession {
-                    Task.detached {
-                        do {
-                            _ = try await activity.activate()
-                        } catch {
-                            print("Error activating activity: \(error)")
-                            
-                            Task { @MainActor in
-                                isActivationErrorViewPresented = true
+            
+            if !appModel.isSingleUser {
+                Button(text, systemImage: "shareplay") {
+                    if groupStateObserver.isEligibleForGroupSession {
+                        Task.detached {
+                            do {
+                                _ = try await activity.activate()
+                            } catch {
+                                print("Error activating activity: \(error)")
+                                
+                                Task { @MainActor in
+                                    isActivationErrorViewPresented = true
+                                }
                             }
                         }
+                    } else {
+                        isActivitySharingViewPresented = true
                     }
-                } else {
-                    isActivitySharingViewPresented = true
                 }
-            }
-            .tint(.green)
-            .sheet(isPresented: $isActivitySharingViewPresented) {
-                activitySharingView
-            }
-            .alert("Unable to start game", isPresented: $isActivationErrorViewPresented) {
-                Button("Ok", role: .cancel) { }
-            } message: {
-                Text("Please try again later.")
+                .tint(.green)
+                .sheet(isPresented: $isActivitySharingViewPresented) {
+                    activitySharingView
+                }
+                .alert("Unable to start game", isPresented: $isActivationErrorViewPresented) {
+                    Button("Ok", role: .cancel) { }
+                } message: {
+                    Text("Please try again later.")
+                }
             }
         }
     }

@@ -11,50 +11,42 @@ import RealityKitContent
 import AVFoundation
 
 struct ImmersiveView: View {
-
+    
     @Environment(AppModel.self) var appModel
+    
     var body: some View {
-        //let videoURL = Bundle.main.url(forResource: "lancia_dag_360", withExtension: "mp4")!
-        let videoURL = Bundle.main.url(forResource: "philips-visvijver", withExtension: "mp4")!
-        let player = AVPlayer(url: videoURL)
-        let videoMaterial = VideoMaterial(avPlayer: player)
+        @Bindable var appModel = appModel
         
         RealityView { content in
-            //appModel.sessionController?.gameStateChanged()
-            guard appModel.selectedWorld != "" else {
+            do {
+                try appModel.videoModel?.loadVideo(named: appModel.selectedWorld.description)
+            } catch {
+                print("Could not load video file \"\(appModel.selectedWorld.description).mp4\"")
                 return
             }
-            player.actionAtItemEnd = .none
-            NotificationCenter.default.addObserver(
-                forName: .AVPlayerItemDidPlayToEndTime,
-                object: player.currentItem,
-                queue: .main
-            ) { _ in
-                player.seek(to: .zero)
-                player.play()
+            let entity = Entity()
+            guard let videoMaterial = appModel.videoModel?.videoMaterial else {
+                return
             }
-            //content.add(root)
-            if let skyBox = appModel.skyBox {
-                if var modelComponent = skyBox.components[ModelComponent.self] {
-                    modelComponent.materials = [videoMaterial]
-                    
-                    // Set the component back
-                    skyBox.components.set(modelComponent)
-                }
-                content.add(skyBox)
-                player.play()
+            entity.components.set(
+                ModelComponent(mesh: .generateSphere(radius: 30),
+                               materials: [videoMaterial])
+            )
+            entity.scale *= .init(x:-1, y:1, z:1)
+            let rotation = simd_quatf(angle: -.pi / 2, axis: [0, 1, 0])
+            entity.orientation = rotation * entity.orientation
+            if !appModel.isSingleUser {
+                entity.position = appModel.sphereCenter
             }
-  
-            // Add the initial RealityKit content
-//            if let immersiveContentEntity = try? await Entity(named: "Immersive", in: realityKitContentBundle) {
-//                content.add(immersiveContentEntity)
-//            }
+            content.add(entity)
         }
+        // Trick to redraw the RealityView when
+        .id(appModel.selectedWorld)
     }
 }
 
-//#Preview(immersionStyle: .mixed) {
-//    ImmersiveView()
-//        .environment(AppModel())
-//}
+#Preview(immersionStyle: .mixed) {
+    ImmersiveView()
+        .environment(AppModel())
+}
 
