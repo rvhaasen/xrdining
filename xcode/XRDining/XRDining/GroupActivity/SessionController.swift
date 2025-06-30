@@ -1,6 +1,6 @@
 //
 //  SessionController.swift
-//  TestWithPersonas
+//  XRDining
 //
 //  Created by Rick van Haasen on 24/06/2025.
 //

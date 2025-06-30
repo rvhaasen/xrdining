@@ -48,5 +48,11 @@ playground.xcworkspace
 # Xcode Preview canvas cache
 *.canvas
 
+# Trained models for object detection
+*.referenceobject
+
 # Video files
 **/videos/
+
+# Images
+*.jpg

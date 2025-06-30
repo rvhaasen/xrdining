@@ -2,22 +2,20 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>CFBundleDocumentTypes</key>
+	<array>
+		<dict/>
+	</array>
+	<key>NSWorldSensingUsageDescription</key>
+	<string>App needs to track user location</string>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationPreferredDefaultSceneSessionRole</key>
 		<string>UIWindowSceneSessionRoleApplication</string>
 		<key>UIApplicationSupportsMultipleScenes</key>
 		<true/>
-		<key>UISceneConfigurations</key>
-		<dict>
-			<key>UISceneSessionRoleImmersiveSpaceApplication</key>
-			<array>
-				<dict>
-					<key>UISceneInitialImmersionStyle</key>
-					<string>UIImmersionStyleMixed</string>
-				</dict>
-			</array>
-		</dict>
+		<key>UIApplicationSupportsTabbedSceneCollection</key>
+		<false/>
 	</dict>
 </dict>
 </plist>

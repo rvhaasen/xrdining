@@ -1,13 +1,13 @@
 //
-//  TestWithPersonasWindow.swift
-//  TestWithPersonas
+//  XRDiningWindow.swift
+//  XRDining
 //
 //  Created by Rick van Haasen on 24/06/2025.
 //
 
 import SwiftUI
 
-struct TestWithPersonasWindow : Scene {
+struct XRDiningWindow : Scene {
     @Environment(AppModel.self) var appModel
     
     var body: some Scene {

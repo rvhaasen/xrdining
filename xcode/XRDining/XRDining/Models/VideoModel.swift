@@ -1,6 +1,6 @@
 //
 //  VideoModel.swift
-//  TestWithPersonas
+//  XRDining
 //
 //  Created by Rick van Haasen on 28/06/2025.
 //

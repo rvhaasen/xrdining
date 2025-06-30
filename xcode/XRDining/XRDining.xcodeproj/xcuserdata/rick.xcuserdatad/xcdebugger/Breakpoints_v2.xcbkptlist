@@ -7,17 +7,17 @@
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            uuid = "3D5C46CC-5E91-4FC9-8FA2-972DBA028202"
+            uuid = "9874662D-489B-47A5-AB9C-1284DA080B2E"
             shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "TestWithPersonas/GroupActivity/SessionController.swift"
+            filePath = "XRDining/Views/ImmersiveView.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "42"
-            endingLineNumber = "42"
-            landmarkName = "init?(_:appModel:)"
-            landmarkType = "7">
+            startingLineNumber = "24"
+            endingLineNumber = "24"
+            landmarkName = "body"
+            landmarkType = "24">
          </BreakpointContent>
       </BreakpointProxy>
    </Breakpoints>

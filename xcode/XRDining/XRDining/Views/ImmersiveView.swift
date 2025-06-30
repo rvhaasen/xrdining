@@ -1,6 +1,6 @@
 //
 //  ImmersiveView.swift
-//  TestWithPersonas
+//  XRDining
 //
 //  Created by Rick van Haasen on 18/06/2025.
 //
@@ -9,6 +9,7 @@ import SwiftUI
 import RealityKit
 import RealityKitContent
 import AVFoundation
+import OSLog
 
 struct ImmersiveView: View {
     
@@ -18,6 +19,7 @@ struct ImmersiveView: View {
         @Bindable var appModel = appModel
         
         RealityView { content in
+            content.add(appModel.setupContentEntity())
             do {
                 try appModel.videoModel?.loadVideo(named: appModel.selectedWorld.description)
             } catch {
@@ -42,6 +44,16 @@ struct ImmersiveView: View {
         }
         // Trick to redraw the RealityView when
         .id(appModel.selectedWorld)
+//        .task {
+//            await appModel.monitorSessionUpdates()
+//        }
+//        .task {
+//            await appModel.runSession()
+//        }
+//        .task {
+//            await appModel.processImageTrackingUpdates()
+//        }
+
     }
 }
 
@@ -49,4 +61,6 @@ struct ImmersiveView: View {
     ImmersiveView()
         .environment(AppModel())
 }
+@MainActor
+let logger = Logger(subsystem: "com.biteplanet.XRDining", category: "general")
 
