@@ -31,7 +31,7 @@ struct ImmersiveView: View {
                 return
             }
             entity.components.set(
-                ModelComponent(mesh: .generateSphere(radius: 30),
+                ModelComponent(mesh: .generateSphere(radius: 45),
                                materials: [videoMaterial])
             )
             entity.scale *= .init(x:-1, y:1, z:1)
@@ -44,16 +44,6 @@ struct ImmersiveView: View {
         }
         // Trick to redraw the RealityView when
         .id(appModel.selectedWorld)
-//        .task {
-//            await appModel.monitorSessionUpdates()
-//        }
-//        .task {
-//            await appModel.runSession()
-//        }
-//        .task {
-//            await appModel.processImageTrackingUpdates()
-//        }
-
     }
 }
 

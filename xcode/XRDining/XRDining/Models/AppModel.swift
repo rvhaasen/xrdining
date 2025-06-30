@@ -64,7 +64,6 @@ class AppModel {
             }
         }
     }
-
     var selectedWorld: World
     
     var isSingleUser: Bool = false
@@ -76,7 +75,7 @@ class AppModel {
     
     var videoModel: VideoModel?
     
-    var sphereCenter = SIMD3<Float>(0, 30, -0.5)
+    var sphereCenter = SIMD3<Float>(0, -0.5, 30)
     
     // When a person denies authorization or a data provider state changes to an error condition,
     // the main window displays an error message based on the `errorState`.
@@ -84,7 +83,11 @@ class AppModel {
     
  
     private var areAllDataProvidersSupported: Bool {
-        return ImageTrackingProvider.isSupported && PlaneDetectionProvider.isSupported
+        if isSimulator {
+            return true
+        } else {
+            return ImageTrackingProvider.isSupported && PlaneDetectionProvider.isSupported
+        }
     }
     
     func areAllDataProvidersAuthorized() async -> Bool {
@@ -202,9 +205,16 @@ class AppModel {
     init() {
         
         videoModel = VideoModel()
-        
         self.selectedWorld = .visvijver
-        
+        if !isSimulator {
+            runBackgroundTasks()
+        }
+    }
+    let isSimulator: Bool = {
+        return ProcessInfo.processInfo.environment["SIMULATOR_DEVICE_NAME"] != nil
+    }()
+    
+    func runBackgroundTasks() {
         if !areAllDataProvidersSupported {
             errorState = .providerNotSupported
         }
@@ -222,8 +232,6 @@ class AppModel {
         Task {
             await processImageTrackingUpdates()
         }
-
-
     }
     func setupContentEntity() -> Entity {
         return contentRoot

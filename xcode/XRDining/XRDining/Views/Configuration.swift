@@ -45,7 +45,7 @@ struct Configuration: View {
 }
 
 #Preview(windowStyle: .automatic) {
-    var model = AppModel()
+     let model = AppModel()
     //model.selectedWorld = "Test"
     Configuration()
         .environment(model)
