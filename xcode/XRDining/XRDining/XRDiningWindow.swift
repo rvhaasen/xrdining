@@ -13,7 +13,7 @@ struct XRDiningWindow : Scene {
     var body: some Scene {
         WindowGroup {
             MainView()
-            .frame(width: 900, height: 600)
+            .frame(width: 800, height: 500)
         }
         .windowResizability(.contentSize)
     }

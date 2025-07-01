@@ -40,12 +40,12 @@ struct DiningTemplate: SpatialTemplate {
     
 //    static let player1Position = Point3D(x: 0, z: -1)
 //    static let player2Position = Point3D(y: 0, z: -3)
-
+    var screenDistance: Double
     /// An array that represents the order the game adds participants to spatial template positions.
     var elements: [any SpatialTemplateElement] {
 
-        let player1Element = SpatialTemplateElementPosition.app.offsetBy(x: -1, z: 20)
-        let player2Element = SpatialTemplateElementPosition.app.offsetBy(x: 1, z: 20)
+        let player1Element = SpatialTemplateElementPosition.app.offsetBy(x: -1, z: screenDistance)
+        let player2Element = SpatialTemplateElementPosition.app.offsetBy(x: 1, z: screenDistance)
         //let player3Element = SpatialTemplateElementPosition.app.offsetBy(x: 0, z: -1)
 
         let activeTeamSeats: [any SpatialTemplateElement] = [

@@ -38,7 +38,8 @@ struct ImmersiveView: View {
             let rotation = simd_quatf(angle: -.pi / 2, axis: [0, 1, 0])
             entity.orientation = rotation * entity.orientation
             if !appModel.isSingleUser {
-                entity.position = appModel.sphereCenter
+                //entity.position =  SIMD3<Float>(0, -0.5, 35)
+                entity.position = SIMD3<Float>(0, -appModel.seatHeightOffset, appModel.screen2tableDistance + 10.0)
             }
             content.add(entity)
         }

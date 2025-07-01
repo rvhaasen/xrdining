@@ -75,7 +75,12 @@ class AppModel {
     
     var videoModel: VideoModel?
     
-    var sphereCenter = SIMD3<Float>(0, -0.5, 30)
+    // TODO: refactor in order to make it content dependent,
+    // e.g. current value of 0.5 was for the "philips visvijver" video
+    let screen2tableDistance: Float = 20.0
+    let seatHeightOffset: Float = 0.5
+    
+    //var sphereCenter = SIMD3<Float>(0, -0.5, 35)
     
     // When a person denies authorization or a data provider state changes to an error condition,
     // the main window displays an error message based on the `errorState`.

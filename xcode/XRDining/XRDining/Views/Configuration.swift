@@ -14,33 +14,34 @@ struct Configuration: View {
         @Bindable var appModel = appModel
 
         // A Picker for selecting a world
-        VStack {
-            VStack {
-                Text("Configuration")
-                    .font(.largeTitle)
-                    .bold()
-                    .padding(.bottom, 16)
-                    .foregroundStyle(.green)
-            }
-            HStack{
-                Text("360 degree environment:").font(.headline)
+        VStack(spacing: 32) {
+            Text("Configuration")
+                .bold()
+                .padding(.bottom, 16)
+                .foregroundStyle(.green)
+                .font(.title)
+            HStack {
+                Text("360 degree environment:")
                 Picker("Worlds", selection: $appModel.selectedWorld) {
                     ForEach(AppModel.World.allCases) { world in
                         Text(world.description)
                     }
                 }
+            //Spacer()
             }
-            VStack {
+            VStack(spacing: 20) {
                 Toggle(isOn: $appModel.isSingleUser) {
                     Label("single-user", systemImage: "person")
                 }
                 Toggle(isOn: $appModel.doObjectDetection) {
                     Label("object detection", systemImage: "magnifyingglass")
                 }
-            }.frame(maxWidth: 250)
+            }
+            .frame(maxWidth: 300)
         }
         .padding()
         .frame(maxWidth: 700)
+        .font(.title3)
     }
 }
 
