@@ -7,12 +7,14 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		1D0588BF2E1423E800908DE2 /* Otto lenghi 1.referenceobject in Sources */ = {isa = PBXBuildFile; fileRef = 1D0588BE2E1423E800908DE2 /* Otto lenghi 1.referenceobject */; };
 		1D33F3EC2E0D80B700930051 /* philips-visvijver.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 1D33F3EB2E0D80B700930051 /* philips-visvijver.mp4 */; };
 		1D90B69A2E12739E00074AAC /* lancia_dag_360.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 1D90B6992E12739E00074AAC /* lancia_dag_360.mp4 */; };
 		1DFEB0BB2E02B93E0081E5E7 /* RealityKitContent in Frameworks */ = {isa = PBXBuildFile; productRef = 1DFEB0BA2E02B93E0081E5E7 /* RealityKitContent */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		1D0588BE2E1423E800908DE2 /* Otto lenghi 1.referenceobject */ = {isa = PBXFileReference; lastKnownFileType = file.referenceobject; name = "Otto lenghi 1.referenceobject"; path = "/Users/rick/VisionOS/ExploringObjectTrackingWithARKit/Reference Objects/Otto lenghi 1.referenceobject"; sourceTree = "<absolute>"; };
 		1D33F3EB2E0D80B700930051 /* philips-visvijver.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; name = "philips-visvijver.mp4"; path = "videos/philips-visvijver.mp4"; sourceTree = "<group>"; };
 		1D90B6992E12739E00074AAC /* lancia_dag_360.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; name = lancia_dag_360.mp4; path = videos/lancia_dag_360.mp4; sourceTree = "<group>"; };
 		1DFEB0B52E02B93E0081E5E7 /* XRDining.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = XRDining.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -55,6 +57,7 @@
 		1DFEB0AC2E02B93E0081E5E7 = {
 			isa = PBXGroup;
 			children = (
+				1D0588BE2E1423E800908DE2 /* Otto lenghi 1.referenceobject */,
 				1D90B6992E12739E00074AAC /* lancia_dag_360.mp4 */,
 				1D33F3EB2E0D80B700930051 /* philips-visvijver.mp4 */,
 				1DFEB0B72E02B93E0081E5E7 /* XRDining */,
@@ -156,6 +159,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				1D0588BF2E1423E800908DE2 /* Otto lenghi 1.referenceobject in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

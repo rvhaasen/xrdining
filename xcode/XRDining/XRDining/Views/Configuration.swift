@@ -37,10 +37,16 @@ struct Configuration: View {
                     Label("object detection", systemImage: "magnifyingglass")
                 }
             }
-            .frame(maxWidth: 300)
+            NavigationLink {
+                ObjectTrackingView()
+            } label: {
+                Text("Configure object tracking")
+            }
+            .disabled(!appModel.doObjectDetection)
+            //.frame(maxWidth: 300)
         }
         .padding()
-        .frame(maxWidth: 700)
+        .frame(maxWidth: 500)
         .font(.title3)
     }
 }

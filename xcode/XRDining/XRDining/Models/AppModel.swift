@@ -11,25 +11,40 @@ import Observation
 import ARKit
 import RealityKit
 internal import os
+import OSLog
 
 /// Maintains app-wide state
 
 @Observable @MainActor
 class AppModel {
     
-    private let session = ARKitSession()
-    private let imageTracking = ImageTrackingProvider(referenceImages: ReferenceImage.loadReferenceImages(inGroupNamed: "ARImages"))
+    private let arkitSession = ARKitSession()
     
+    // Configure he image tracking provider
+    private let imageTracking = ImageTrackingProvider(referenceImages: ReferenceImage.loadReferenceImages(inGroupNamed: "ARImages"))
+
+    // Image anchors and their corresponding entities
     var imageAnchors = [UUID: ImageAnchor]()
     var entityMap = [UUID: Entity]()
     
-    let contentRoot = Entity()
-    
+    // TODO: these 2 are most likely not needed, remove them
     var imageWidth: Float = 0
     var imageHeight: Float = 0
+
+    // Detected images will create an entity that  detected images that will be added to contentRoot. For removing .removeFromParent is used on the particular entity. During setup of the reality-view the contentRoot is added to the scene.
+    let contentRoot = Entity()
+
+    // The object tracking provider cannot be configured yes, for this the Reference object first have to be loaded.
+    private var objectTrackingProvider: ObjectTrackingProvider?
+    
+    private var objectVisualizations: [UUID: ObjectAnchorVisualization] = [:]
+    
     var sessionController: SessionController?
 
     let immersiveSpaceID = "ImmersiveSpace"
+    
+    let objectTracking = ObjectTrackingModel()
+    
     enum ImmersiveSpaceState {
         case closed
         case inTransition
@@ -69,7 +84,7 @@ class AppModel {
     var isSingleUser: Bool = false
     var doObjectDetection: Bool = false
     
-    var immersiveSpaceState = ImmersiveSpaceState.closed
+    var immersiveSpaceState : ImmersiveSpaceState = .closed
     
     var skyBox: Entity? = nil
     
@@ -86,13 +101,33 @@ class AppModel {
     // the main window displays an error message based on the `errorState`.
     var errorState: ErrorState = .noError
     
+    var worldSensingAuthorizationStatus = ARKitSession.AuthorizationStatus.notDetermined
+
  
-    private var areAllDataProvidersSupported: Bool {
+    var areAllDataProvidersSupported: Bool {
         if isSimulator {
             return true
         } else {
-            return ImageTrackingProvider.isSupported && PlaneDetectionProvider.isSupported
+            return ImageTrackingProvider.isSupported && PlaneDetectionProvider.isSupported && ObjectTrackingProvider.isSupported
         }
+    }
+    var allRequiredAuthorizationsAreGranted: Bool {
+        worldSensingAuthorizationStatus == .allowed
+    }
+    var canEnterImmersiveSpace: Bool {
+        allRequiredAuthorizationsAreGranted && allRequiredAuthorizationsAreGranted
+    }
+    func queryWorldSensingAuthorization() async {
+        let authorizationResult = await arkitSession.queryAuthorization(for: [.worldSensing])
+        worldSensingAuthorizationStatus = authorizationResult[.worldSensing]!
+    }
+    func didLeaveImmersiveSpace() {
+        // Stop the provider; the provider that just ran in the
+        // immersive space is now in a paused state and isn't needed
+        // anymore. When a person reenters the immersive space,
+        // run a new provider.
+        arkitSession.stop()
+        immersiveSpaceState = .closed
     }
     
     func areAllDataProvidersAuthorized() async -> Bool {
@@ -104,7 +139,7 @@ class AppModel {
     }
     /// Responds to events such as authorization revocation.
     func monitorSessionUpdates() async {
-        for await event in session.events {
+        for await event in arkitSession.events {
             logger.info("\(event.description)")
             switch event {
             case .authorizationChanged(type: _, status: let status):
@@ -125,9 +160,27 @@ class AppModel {
         }
     }
     
-    func runSession() async {
+    func runARKitSession() async {
+
+        let referenceObjects = objectTracking.referenceObjectLoader.enabledReferenceObjects
+        
+        
+        var trackingProviders: [DataProvider] = [imageTracking]
+        
+        // Only provision the objectTracking provider when needed
+        if !referenceObjects.isEmpty {
+            // TODO: a new session should be started when entering the immersive space, currently
+            // this is done 1 time during initialisation of the AppModel, which makes it not
+            // possible to load new selected reference objects during runtime
+            objectTrackingProvider = ObjectTrackingProvider(referenceObjects: referenceObjects)
+            if let objectTrackingProvider = objectTrackingProvider {                trackingProviders.append(objectTrackingProvider)
+            }
+            else {
+                logger.error("TRACKING ERROR: Failed to create ObjectTrackingProvider.")
+            }
+        }
         do {
-            try await session.run([imageTracking])
+            try await arkitSession.run(trackingProviders)
         } catch {
             guard error is ARKitSession.Error else {
                 preconditionFailure("Unexpected error \(error).")
@@ -164,18 +217,11 @@ class AppModel {
             let imageName = anchor.referenceImage.name ?? "Unknown Image"
             logger.info("Image \(imageName) added")
             let quad = MeshResource.generatePlane(width: width, height: height)
-            
             let entity = ModelEntity(mesh: quad, materials: [OcclusionMaterial()])
-//            let entity = ModelEntity(mesh: quad, materials: [UnlitMaterial(color: .green)])
-            //entity.components.set(PortalComponent(target: portalWorld,
-            //                                      clippingMode: .plane(.positiveZ),
-            //                                      crossingMode: .plane(.positiveZ)))
-            
+
             entityMap[anchor.id] = entity
             contentRoot.addChild(entity)
             imageAnchors[anchor.id] = anchor
-            
-            //await createPortalOpeningAnimationEntity(portalQuadEntity: entity)
         }
         
         if anchor.isTracked {
@@ -183,10 +229,6 @@ class AppModel {
             let rotationX = simd_quatf(angle: -.pi/2, axis: [1, 0, 0]) // Align entity to Poster
             transform.rotation = transform.rotation * rotationX
             entityMap[anchor.id]?.transform = transform
-            
-            //setRobotPositionAndOrientation(imageAnchor: anchor)
-            
-            //createPlatformForRobot()
         }
     }
     func updateImage(_ anchor: ImageAnchor) {
@@ -208,7 +250,6 @@ class AppModel {
 
     // Constructor
     init() {
-        
         videoModel = VideoModel()
         self.selectedWorld = .visvijver
         if !isSimulator {
@@ -222,20 +263,59 @@ class AppModel {
     func runBackgroundTasks() {
         if !areAllDataProvidersSupported {
             errorState = .providerNotSupported
+            return
         }
+        
         Task {
             if await !areAllDataProvidersAuthorized() {
                 errorState = .providerNotAuthorized
             }
-        }
-        Task {
-            await monitorSessionUpdates()
-        }
-        Task {
-            await runSession()
-        }
-        Task {
-            await processImageTrackingUpdates()
+            else {
+                // In order to start the ARKit session, the image- and objectTracking providers should
+                // be configured. For the first, this is already done. For the objectTracking however
+                // the objects should be loaded first. After that the ARKit session can run with the configures providers
+                
+                await objectTracking.referenceObjectLoader.loadBuiltInReferenceObjects()
+                
+                Task {
+                    await monitorSessionUpdates()
+                }
+                Task {
+                    await runARKitSession()
+                }
+                Task {
+                    await processImageTrackingUpdates()
+                }
+                // Process object tracking updates
+                Task {
+                    // Wait for object anchor updates and maintain a dictionary of visualizations
+                    // that are attached to those anchors.
+                    for await anchorUpdate in objectTrackingProvider!.anchorUpdates {
+                        let anchor = anchorUpdate.anchor
+                        let id = anchor.id
+                        
+                        switch anchorUpdate.event {
+                        case .added:
+                            // Create a new visualization for the reference object that ARKit just detected.
+                            // The app displays the USDZ file that the reference object was trained on as
+                            // a wireframe on top of the real-world object, if the .referenceobject file contains
+                            // that USDZ file. If the original USDZ isn't available, the app displays a bounding box instead.
+                            let model = objectTracking.referenceObjectLoader.usdzsPerReferenceObjectID[anchor.referenceObject.id]
+                            let visualization = ObjectAnchorVisualization(for: anchor, withModel: model, withState: self)
+                            //visualization.entity.components.set(visibleObjectsGroup)
+                            self.objectVisualizations[id] = visualization
+                            contentRoot.addChild(visualization.entity)
+                            logger.info("TRACKING added \(anchor.referenceObject.name)")
+                        case .updated:
+                            objectVisualizations[id]?.update(with: anchor)
+                        case .removed:
+                            objectVisualizations[id]?.entity.removeFromParent()
+                            objectVisualizations.removeValue(forKey: id)
+                            logger.info("TRACKING removed \(anchor.referenceObject.name)")
+                        }
+                    }
+                }
+            }
         }
     }
     func setupContentEntity() -> Entity {
