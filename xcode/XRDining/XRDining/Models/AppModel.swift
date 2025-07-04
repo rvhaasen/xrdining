@@ -18,7 +18,9 @@ import OSLog
 @Observable @MainActor
 class AppModel {
     
-    private let arkitSession = ARKitSession()
+    let arkitSession = ARKitSession()
+    
+    private var sessionTask: Task<Void, Never>?
     
     // Configure he image tracking provider
     private let imageTracking = ImageTrackingProvider(referenceImages: ReferenceImage.loadReferenceImages(inGroupNamed: "ARImages"))
@@ -280,7 +282,7 @@ class AppModel {
                 Task {
                     await monitorSessionUpdates()
                 }
-                Task {
+                sessionTask = Task {
                     await runARKitSession()
                 }
                 Task {
@@ -320,5 +322,10 @@ class AppModel {
     }
     func setupContentEntity() -> Entity {
         return contentRoot
+    }
+    
+    deinit {
+        // Is this needed?
+        arkitSession.stop()
     }
 }

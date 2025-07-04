@@ -7,10 +7,12 @@
 
 import SwiftUI
 
+
 @main
 struct XRDiningApp: App {
 
     @State var appModel = AppModel()
+    @Environment(\.scenePhase) var scenePhase
 
     var body: some Scene {
         Group {
@@ -26,5 +28,13 @@ struct XRDiningApp: App {
             }
         }
         .environment(appModel)
-     }
+//        .onChange(of: scenePhase) { _, newPhase in
+//            switch newPhase {
+//            case .background:
+//                appModel.arkitSession.pause()
+//            default:
+//                break
+//            }
+//        }
+    }
 }
