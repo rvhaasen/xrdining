@@ -26,25 +26,65 @@ struct ImmersiveView: View {
                 print("Could not load video file \"\(appModel.selectedWorld.description).mp4\"")
                 return
             }
-            let entity = Entity()
+            //let entity = Entity()
             guard let videoMaterial = appModel.videoModel?.videoMaterial else {
                 return
             }
-            entity.components.set(
-                ModelComponent(mesh: .generateSphere(radius: 45),
-                               materials: [videoMaterial])
-            )
-            entity.scale *= .init(x:-1, y:1, z:1)
+            let mySphere = ModelEntity( mesh: .generateSphere(radius: 45),
+                materials: [videoMaterial])
+            mySphere.name = "sphere"
+
+            //entity.components.set(
+            //    ModelComponent(mesh: .generateSphere(radius: 45),
+            //                   materials: [videoMaterial])
+            //)
+            //entity.name = "sphere"
+            mySphere.scale *= .init(x:-1, y:1, z:1)
             let rotation = simd_quatf(angle: -.pi / 2, axis: [0, 1, 0])
-            entity.orientation = rotation * entity.orientation
+            mySphere.orientation = rotation * mySphere.orientation
             if !appModel.isSingleUser {
                 //entity.position =  SIMD3<Float>(0, -0.5, 35)
-                entity.position = SIMD3<Float>(0, -appModel.seatHeightOffset, appModel.screen2tableDistance + 10.0)
+                mySphere.position = SIMD3<Float>(0, -appModel.seatHeightOffset, appModel.screen2tableDistance + 10.0)
             }
-            content.add(entity)
+            content.add(mySphere)
+        } update: { content in
+            
+//            for entity in content.entities {
+//                // Do something with each entity
+//                logger.info("UPDATE closure: Entity name: \(entity.name)")
+//            }
+//            logger.info("Now recursive:")
+//            for root in content.entities {
+//                visitAllEntities(root) { entity in
+//                    logger.info("Entity name: \(entity.name)")
+//                }
+//            }
+            let _ = appModel.sphereAngle
+            logger.info("SPHERE rotate in to \(appModel.sphereAngle)")
+//            if let rootEntity = content.entities.first,
+//               let mySphere = rootEntity.findEntity(named: "sphere") as? ModelEntity {
+//                logger.info("SPHERE object found")
+//                mySphere.transform.rotation = simd_quatf(angle: Float(appModel.sphereAngle), axis: [1, 0, 0])
+//            }
+            if let foundEntity = content.entities.first(where: { $0.name == "sphere" }) {
+                    // Use foundEntity
+                logger.info("SPHERE object found")
+                foundEntity.transform.rotation = simd_quatf(angle: Float(appModel.sphereAngle/360 * 2 * .pi), axis: [0, 0, 1])
+                }
+//            if let mySphere = content.entities.first.findEntity(named: "sphere") {
+//                logger.info("SPHERE object found")
+//                mySphere.transform.rotation = simd_quatf(angle: Float(appModel.sphereAngle), axis: [1, 0, 0])
+//            }
         }
         // Trick to redraw the RealityView when
+        // a different video file is selected
         .id(appModel.selectedWorld)
+    }
+    func visitAllEntities(_ entity: Entity, action: (Entity) -> Void) {
+        action(entity)
+        for child in entity.children {
+            visitAllEntities(child, action: action)
+        }
     }
 }
 

@@ -36,6 +36,7 @@ struct Configuration: View {
                 Toggle(isOn: $appModel.doObjectDetection) {
                     Label("object detection", systemImage: "magnifyingglass")
                 }
+                Slider(value: $appModel.sphereAngle, in: -45...45, step: 1 )
             }
             NavigationLink {
                 ObjectTrackingView()
@@ -46,7 +47,7 @@ struct Configuration: View {
             //.frame(maxWidth: 300)
         }
         .padding()
-        .frame(maxWidth: 500)
+        .frame(maxWidth: 700)
         .font(.title3)
     }
 }

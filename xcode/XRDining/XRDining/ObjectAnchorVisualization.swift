@@ -45,6 +45,7 @@ class ObjectAnchorVisualization {
             entity.addChild(model)
         }
         
+        // Only show bounding box when there is no model to show
         boundingBoxOutline.entity.isEnabled = model == nil
 //        boundingBoxOutline.entity.isEnabled = true
 

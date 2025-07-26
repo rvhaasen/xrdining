@@ -32,6 +32,8 @@ class AppModel {
     // TODO: these 2 are most likely not needed, remove them
     var imageWidth: Float = 0
     var imageHeight: Float = 0
+    
+    var sphereAngle: Double = 0.0
 
     // Detected images will create an entity that  detected images that will be added to contentRoot. For removing .removeFromParent is used on the particular entity. During setup of the reality-view the contentRoot is added to the scene.
     let contentRoot = Entity()
@@ -54,12 +56,28 @@ class AppModel {
     }
     
     enum World: CustomStringConvertible, CaseIterable, Identifiable {
-        case visvijver,lanciaDag,none
+        case
+            visvijver,
+            //visvijver_qoocam_topaz_starlight_mini,
+            visvijver_qoocam_topaz,
+            //visvijver_qoocam_topaz_8K,
+            //visvijver_qoocam_topaz_57K,
+            //visvijver_qoocam_57K,
+            lanciaDag,none
         var id: Self { self }
         
         var description: String {
             switch self {
+                case .visvijver_qoocam_topaz: return "visvijver_qoocam_8k30_8k_topaz"
                 case .visvijver: return "philips-visvijver"
+                //case .visvijver_qoocam_topaz_starlight_mini: return "visvijver_qoocam_8k30_8k_topaz"
+                //case .visvijver_qoocam_topaz_8K: return "qoocam3_visvijver_1_auto_ev_min3_topaz_8K"
+                //case .visvijver_qoocam_topaz_57K:  return
+                //"qoocam3_visvijver_1_auto_ev_min3_no_upscale"
+                //case .visvijver_qoocam_57K: return "philips-visvijver_qoocam"
+                //"qoocam3_visvijver_1_auto_ev_min3_stabilized_prob4"
+                //"philips-visvijver_qoocam"
+                //qoocam3_visvijver_1_auto_ev_min3_topaz_8K"
                 case .lanciaDag: return "lancia_dag_360"
                 case .none: return "none"
             }
@@ -167,8 +185,9 @@ class AppModel {
         let referenceObjects = objectTracking.referenceObjectLoader.enabledReferenceObjects
         
         
-        var trackingProviders: [DataProvider] = [imageTracking]
-        
+//        var trackingProviders: [DataProvider] = [imageTracking]
+        var trackingProviders: [DataProvider] = []
+
         // Only provision the objectTracking provider when needed
         if !referenceObjects.isEmpty {
             // TODO: a new session should be started when entering the immersive space, currently
