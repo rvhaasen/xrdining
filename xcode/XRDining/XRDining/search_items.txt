@@ -1,0 +1,56 @@
+
+
+
+
+Info usefull for debugging object detection not working anymore after restart of application
+
+
+HomeView scene phase: active
+nw_socket_copy_info [C1:2] getsockopt TCP_INFO failed [102: Operation not supported on socket]
+nw_socket_copy_info getsockopt TCP_INFO failed [102: Operation not supported on socket]
+
+# 1- loading reference objects
+
+[TRACKING] Looking for reference objects in the main bundle ...
+Loading reference object from file:///private/var/containers/Bundle/Application/66C14D0D-4AC9-4661-A1CA-D2C649DF39A6/XRDining.app/picknick_tafel.referenceobject
+Loading reference object from file:///private/var/containers/Bundle/Application/66C14D0D-4AC9-4661-A1CA-D2C649DF39A6/XRDining.app/Otto%20lenghi%201.referenceobject
+TRACKING loading usdz model from file:///private/var/mobile/Containers/Data/Application/6D100C91-BD44-4BF2-BB9B-A7AF71E74C23/tmp/NSIRD_XRDining_0ylnKR/object.usdz
+TRACKING loading usdz model from file:///private/var/mobile/Containers/Data/Application/6D100C91-BD44-4BF2-BB9B-A7AF71E74C23/tmp/NSIRD_XRDining_SnbEZp/object.usdz
+TBB Global TLS count is not == 1, instead it is: 2
+<<<< FigAudioSession(AV) >>>> audioSessionAVAudioSession_CopyMXSessionProperty signalled err=-19224 (kFigAudioSessionError_UnsupportedOperation) (getMXSessionProperty unsupported) at FigAudioSession_AVAudioSession.m:606
+Called -[UIContextMenuInteraction updateVisibleMenuWithBlock:] while no context menu is visible. This won't do anything.
+Picker selection changed from philips-visvijver to none
+Could not load video file "none.mp4"
+Could not load video file "none.mp4"
+SPHERE rotate in to 0.000000
+Failed to set dependencies on asset 18204987512225462956 because NetworkAssetManager does not have an asset entity for that id.
+Failed to set dependencies on asset 12643417570163518613 because NetworkAssetManager does not have an asset entity for that id.
+Cannot find a BindPoint for any bind path: "", "", ""
+Cannot find a BindPoint for any bind path: "", "", ""
+Cannot find a BindPoint for any bind path: "", "", ""
+Cannot find a BindPoint for any bind path: "", "", ""
+
+# 2- Start ObjectTracking provider for the 2 objects
+
+dataProviderStateChanged(dataProviders: [ObjectTrackingProvider(0x1428f0210, state: running, objects: [ReferenceObject(name: "Otto lenghi 1"), ReferenceObject(name: "picknick_tafel")], configuration: TrackingConfiguration(maximumTrackableInstances: 10, maximumInstancesPerReferenceObject: 1, detectionRate: 2.0, stationaryObjectTrackingRate: 5.0, movingObjectTrackingRate: 5.0))], newState: running, error: nil)
+Data providers state changed: [ObjectTrackingProvider(0x1428f0210, state: running, objects: [ReferenceObject(name: "Otto lenghi 1"), ReferenceObject(name: "picknick_tafel")], configuration: TrackingConfiguration(maximumTrackableInstances: 10, maximumInstancesPerReferenceObject: 1, detectionRate: 2.0, stationaryObjectTrackingRate: 5.0, movingObjectTrackingRate: 5.0))], running
+
+# 3- Detected objects
+
+TRACKING added Otto lenghi 1
+TRACKING added picknick_tafel
+SPHERE rotate in to 0.000000
+SPHERE rotate in to 0.000000
+HomeView scene phase: inactive
+SPHERE rotate in to 0.000000
+Attempted to update current immersive space, but no open one was found
+SPHERE rotate in to 0.000000
+SPHERE rotate in to 0.000000
+SPHERE rotate in to 0.000000
+
+# 4- End of application, stopping tracking-providers
+
+dataProviderStateChanged(dataProviders: [ObjectTrackingProvider(0x1428f0210, state: stopped, objects: [ReferenceObject(name: "Otto lenghi 1"), ReferenceObject(name: "picknick_tafel")], configuration: TrackingConfiguration(maximumTrackableInstances: 10, maximumInstancesPerReferenceObject: 1, detectionRate: 2.0, stationaryObjectTrackingRate: 5.0, movingObjectTrackingRate: 5.0))], newState: stopped, error: nil)
+Data providers state changed: [ObjectTrackingProvider(0x1428f0210, state: stopped, objects: [ReferenceObject(name: "Otto lenghi 1"), ReferenceObject(name: "picknick_tafel")], configuration: TrackingConfiguration(maximumTrackableInstances: 10, maximumInstancesPerReferenceObject: 1, detectionRate: 2.0, stationaryObjectTrackingRate: 5.0, movingObjectTrackingRate: 5.0))], stopped
+Failed to set dependencies on asset 14005493044789121733 because NetworkAssetManager does not have an asset entity for that id.
+HomeView scene phase: background

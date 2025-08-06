@@ -10,8 +10,10 @@ import Playgrounds
 
 struct Configuration: View {
     @Environment(AppModel.self) var appModel
+
     var body: some View {
         @Bindable var appModel = appModel
+
 
         // A Picker for selecting a world
         VStack(spacing: 32) {
@@ -23,11 +25,20 @@ struct Configuration: View {
             HStack {
                 Text("360 degree environment:")
                 Picker("Worlds", selection: $appModel.selectedWorld) {
-                    ForEach(AppModel.World.allCases) { world in
+                    ForEach(VideoInfo.World.allCases) { world in
                         Text(world.description)
                     }
                 }
             //Spacer()
+            }.onChange(of: appModel.selectedWorld) { oldValue, newValue in
+                print("Picker selection changed from \(oldValue) to \(newValue)")
+                // Add any custom logic here
+                do {
+                    try appModel.videoModel?.loadVideo(named: newValue.description)
+                } catch {
+                    print("Could not load video file \"\(newValue.description).mp4\"")
+                    return
+                }
             }
             VStack(spacing: 20) {
                 Toggle(isOn: $appModel.isSingleUser) {
@@ -49,6 +60,7 @@ struct Configuration: View {
         .padding()
         .frame(maxWidth: 700)
         .font(.title3)
+
     }
 }
 

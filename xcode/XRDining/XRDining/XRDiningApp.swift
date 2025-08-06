@@ -15,16 +15,21 @@ struct XRDiningApp: App {
     @Environment(\.scenePhase) var scenePhase
 
     var body: some Scene {
+
         Group {
             XRDiningWindow()
+        
             ImmersiveSpace(id: appModel.immersiveSpaceID) {
-                ImmersiveView()
-                    .onAppear {
-                        appModel.immersiveSpaceState = .open
-                    }
-                    .onDisappear {
-                        appModel.immersiveSpaceState = .closed
-                    }
+                ZStack {
+                    KoekjesView()
+                    ImmersiveView()
+                }
+                .onAppear {
+                    appModel.immersiveSpaceState = .open
+                }
+                .onDisappear {
+                    appModel.immersiveSpaceState = .closed
+                }
             }
         }
         .environment(appModel)

@@ -49,6 +49,7 @@ class VideoModel {
         player.play()
     }
 
+    // Stop playing
     func stop() {
             player.pause()
         }

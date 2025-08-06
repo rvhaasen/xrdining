@@ -16,5 +16,9 @@ struct XRDiningWindow : Scene {
             .frame(width: 800, height: 500)
         }
         .windowResizability(.contentSize)
+
+        WindowGroup(id: "koekjes") {
+            CarouselView()
+        }
     }
 }

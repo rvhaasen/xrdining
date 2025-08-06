@@ -13,10 +13,13 @@ struct ToggleImmersiveSpaceButton: View {
 
     @Environment(\.dismissImmersiveSpace) private var dismissImmersiveSpace
     @Environment(\.openImmersiveSpace) private var openImmersiveSpace
+    @Environment(\.openWindow) private var openWindow
 
     var body: some View {
         Button {
             Task { @MainActor in
+                //openWindow(id: "koekjes")
+                
                 switch appModel.immersiveSpaceState {
                     case .open:
                         appModel.immersiveSpaceState = .inTransition

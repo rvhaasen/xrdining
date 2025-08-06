@@ -38,10 +38,10 @@ class AppModel {
     // Detected images will create an entity that  detected images that will be added to contentRoot. For removing .removeFromParent is used on the particular entity. During setup of the reality-view the contentRoot is added to the scene.
     let contentRoot = Entity()
 
-    // The object tracking provider cannot be configured yes, for this the Reference object first have to be loaded.
-    private var objectTrackingProvider: ObjectTrackingProvider?
+    // The object tracking provider cannot be configured yet, for this the Reference object first have to be loaded.
+    var objectTrackingProvider: ObjectTrackingProvider?
     
-    private var objectVisualizations: [UUID: ObjectAnchorVisualization] = [:]
+    var objectVisualizations: [UUID: ObjectAnchorVisualization] = [:]
     
     var sessionController: SessionController?
 
@@ -58,11 +58,7 @@ class AppModel {
     enum World: CustomStringConvertible, CaseIterable, Identifiable {
         case
             visvijver,
-            //visvijver_qoocam_topaz_starlight_mini,
             visvijver_qoocam_topaz,
-            //visvijver_qoocam_topaz_8K,
-            //visvijver_qoocam_topaz_57K,
-            //visvijver_qoocam_57K,
             lanciaDag,none
         var id: Self { self }
         
@@ -70,19 +66,15 @@ class AppModel {
             switch self {
                 case .visvijver_qoocam_topaz: return "visvijver_qoocam_8k30_8k_topaz"
                 case .visvijver: return "philips-visvijver"
-                //case .visvijver_qoocam_topaz_starlight_mini: return "visvijver_qoocam_8k30_8k_topaz"
-                //case .visvijver_qoocam_topaz_8K: return "qoocam3_visvijver_1_auto_ev_min3_topaz_8K"
-                //case .visvijver_qoocam_topaz_57K:  return
-                //"qoocam3_visvijver_1_auto_ev_min3_no_upscale"
-                //case .visvijver_qoocam_57K: return "philips-visvijver_qoocam"
-                //"qoocam3_visvijver_1_auto_ev_min3_stabilized_prob4"
-                //"philips-visvijver_qoocam"
-                //qoocam3_visvijver_1_auto_ev_min3_topaz_8K"
                 case .lanciaDag: return "lancia_dag_360"
                 case .none: return "none"
             }
         }
     }
+    var selectedWorld: VideoInfo.World
+
+    var videos = [VideoInfo.World: VideoInfo]()
+        
     enum ErrorState: Equatable {
         case noError
         case providerNotSupported
@@ -99,7 +91,6 @@ class AppModel {
             }
         }
     }
-    var selectedWorld: World
     
     var isSingleUser: Bool = false
     var doObjectDetection: Bool = false
@@ -114,16 +105,13 @@ class AppModel {
     // e.g. current value of 0.5 was for the "philips visvijver" video
     let screen2tableDistance: Float = 20.0
     let seatHeightOffset: Float = 0.5
-    
-    //var sphereCenter = SIMD3<Float>(0, -0.5, 35)
-    
+        
     // When a person denies authorization or a data provider state changes to an error condition,
     // the main window displays an error message based on the `errorState`.
     var errorState: ErrorState = .noError
     
     var worldSensingAuthorizationStatus = ARKitSession.AuthorizationStatus.notDetermined
 
- 
     var areAllDataProvidersSupported: Bool {
         if isSimulator {
             return true
@@ -146,6 +134,7 @@ class AppModel {
         // immersive space is now in a paused state and isn't needed
         // anymore. When a person reenters the immersive space,
         // run a new provider.
+        logInfo("Stopping ARKit session to leave immersive space.")
         arkitSession.stop()
         immersiveSpaceState = .closed
     }
@@ -160,18 +149,18 @@ class AppModel {
     /// Responds to events such as authorization revocation.
     func monitorSessionUpdates() async {
         for await event in arkitSession.events {
-            logger.info("\(event.description)")
+            logInfo("\(event.description)")
             switch event {
             case .authorizationChanged(type: _, status: let status):
-                logger.info("Authorization changed to: \(status)")
+                logInfo("Authorization changed to: \(status)")
                 
                 if status == .denied {
                     errorState = .providerNotAuthorized
                 }
             case .dataProviderStateChanged(dataProviders: let providers, newState: let state, error: let error):
-                logger.info("Data providers state changed: \(providers), \(state)")
+                logInfo("Data providers state changed: \(providers), \(state)")
                 if let error {
-                    logger.error("Data provider reached an error state: \(error)")
+                    logError("Data provider reached an error state: \(error)")
                     errorState = .sessionError(error)
                 }
             @unknown default:
@@ -197,12 +186,15 @@ class AppModel {
             if let objectTrackingProvider = objectTrackingProvider {                trackingProviders.append(objectTrackingProvider)
             }
             else {
-                logger.error("TRACKING ERROR: Failed to create ObjectTrackingProvider.")
+                logError("TRACKING ERROR: Failed to create ObjectTrackingProvider.")
             }
         }
         do {
+            logInfo("Run arkitSession...")
             try await arkitSession.run(trackingProviders)
+            logInfo("ArkitSession running!")
         } catch {
+            logInfo("Exception running arkitSession: \(error)")
             guard error is ARKitSession.Error else {
                 preconditionFailure("Unexpected error \(error).")
             }
@@ -214,13 +206,13 @@ class AppModel {
             let imageAnchor = update.anchor
             switch update.event {
             case .added:
-                logger.info("[TRACKING] New image anchor added.")
+                logInfo("[TRACKING] New image anchor added.")
                 createImage(imageAnchor)
             case .updated:
                 //logger.info("[TRACKING] image anchor updated.")
                 updateImage(imageAnchor)
             case .removed:
-                logger.info("[TRACKING] image anchor removed")
+                logInfo("[TRACKING] image anchor removed")
                 removeImage(imageAnchor)
             }
         }
@@ -236,7 +228,7 @@ class AppModel {
             let height = Float(imagePhysicalSize.height) * scaleFactor
             imageHeight = height
             let imageName = anchor.referenceImage.name ?? "Unknown Image"
-            logger.info("Image \(imageName) added")
+            logInfo("Image \(imageName) added")
             let quad = MeshResource.generatePlane(width: width, height: height)
             let entity = ModelEntity(mesh: quad, materials: [OcclusionMaterial()])
 
@@ -271,8 +263,13 @@ class AppModel {
 
     // Constructor
     init() {
+        self.selectedWorld = VideoInfo.World.visvijver
+
         videoModel = VideoModel()
-        self.selectedWorld = .visvijver
+        videos[VideoInfo.World.visvijver] = VideoInfo(rotationDegrees: -90.0)
+        videos[VideoInfo.World.visvijver_qoocam_topaz] = VideoInfo(rotationDegrees: 180.0)
+
+        
         if !isSimulator {
             runBackgroundTasks()
         }
@@ -282,59 +279,31 @@ class AppModel {
     }()
     
     func runBackgroundTasks() {
+        logInfo("runBackgroundTasks...")
+        
         if !areAllDataProvidersSupported {
             errorState = .providerNotSupported
+            logInfo("Not all providers supported, no background tasks will be started!")
             return
         }
+        logInfo("All providers supported")
         
         Task {
             if await !areAllDataProvidersAuthorized() {
                 errorState = .providerNotAuthorized
             }
+            
             else {
+    
                 // In order to start the ARKit session, the image- and objectTracking providers should
                 // be configured. For the first, this is already done. For the objectTracking however
                 // the objects should be loaded first. After that the ARKit session can run with the configures providers
                 
+                logInfo("loading reference objects...")
                 await objectTracking.referenceObjectLoader.loadBuiltInReferenceObjects()
-                
+                logInfo("reference objects loaded")
                 Task {
                     await monitorSessionUpdates()
-                }
-                sessionTask = Task {
-                    await runARKitSession()
-                }
-                Task {
-                    await processImageTrackingUpdates()
-                }
-                // Process object tracking updates
-                Task {
-                    // Wait for object anchor updates and maintain a dictionary of visualizations
-                    // that are attached to those anchors.
-                    for await anchorUpdate in objectTrackingProvider!.anchorUpdates {
-                        let anchor = anchorUpdate.anchor
-                        let id = anchor.id
-                        
-                        switch anchorUpdate.event {
-                        case .added:
-                            // Create a new visualization for the reference object that ARKit just detected.
-                            // The app displays the USDZ file that the reference object was trained on as
-                            // a wireframe on top of the real-world object, if the .referenceobject file contains
-                            // that USDZ file. If the original USDZ isn't available, the app displays a bounding box instead.
-                            let model = objectTracking.referenceObjectLoader.usdzsPerReferenceObjectID[anchor.referenceObject.id]
-                            let visualization = ObjectAnchorVisualization(for: anchor, withModel: model, withState: self)
-                            //visualization.entity.components.set(visibleObjectsGroup)
-                            self.objectVisualizations[id] = visualization
-                            contentRoot.addChild(visualization.entity)
-                            logger.info("TRACKING added \(anchor.referenceObject.name)")
-                        case .updated:
-                            objectVisualizations[id]?.update(with: anchor)
-                        case .removed:
-                            objectVisualizations[id]?.entity.removeFromParent()
-                            objectVisualizations.removeValue(forKey: id)
-                            logger.info("TRACKING removed \(anchor.referenceObject.name)")
-                        }
-                    }
                 }
             }
         }
@@ -342,9 +311,13 @@ class AppModel {
     func setupContentEntity() -> Entity {
         return contentRoot
     }
-    
-    deinit {
-        // Is this needed?
-        arkitSession.stop()
-    }
+}
+//@MainActor
+let logger = Logger(subsystem: "com.biteplanet.XRDining", category: "general")
+
+func logInfo(_ message: String) {
+    logger.info("\(message, privacy: .public)")
+}
+func logError(_ message: String) {
+    logger.error("\(message, privacy: .public)")
 }

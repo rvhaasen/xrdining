@@ -10,6 +10,7 @@ import ARKit
 
 @MainActor
 @Observable
+// REFACTOR: put ReferenceObjectLoader directly in AppModel
 class ObjectTrackingModel {
     
     let referenceObjectLoader = ReferenceObjectLoader()

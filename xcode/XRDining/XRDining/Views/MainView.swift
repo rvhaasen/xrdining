@@ -16,7 +16,6 @@ struct MainView: View {
     @Environment(\.scenePhase) private var scenePhase
     @Environment(\.dismissImmersiveSpace) private var dismissImmersiveSpace
     
-    
     var body: some View {
         //ContentView()
         @Bindable var appModel = appModel
@@ -29,6 +28,14 @@ struct MainView: View {
                 } label: {
                     Text("Configuration")
                 }.padding(.bottom, 20)
+                //CarouselView()
+//                NavigationLink {
+//                    CarouselView()
+//                        .glassBackgroundEffect(.hidden)
+//                        .background(Color.clear)
+//                } label: {
+//                    Text("ShowMenu")
+//                }.padding(.bottom, 20)
                 ToggleImmersiveSpaceButton()
             }
             .font(.title2)
@@ -41,6 +48,9 @@ struct MainView: View {
                 .font(.title2)
         }
         .task(observeGroupSessions)
+//        .task {
+//            openWindow(id: "koekjes")
+//        }
         .onChange(of: scenePhase, initial: true) {
                 print("HomeView scene phase: \(scenePhase)")
                 if scenePhase == .active {

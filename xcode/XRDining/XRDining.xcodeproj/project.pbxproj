@@ -10,19 +10,19 @@
 		1D4FEF6F2E19232800D27B9E /* lancia_dag_360.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 1D4FEF6D2E19232800D27B9E /* lancia_dag_360.mp4 */; };
 		1D4FEF702E19232800D27B9E /* philips-visvijver.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 1D4FEF6E2E19232800D27B9E /* philips-visvijver.mp4 */; };
 		1D4FEF772E1926AA00D27B9E /* picknick_tafel.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 1D4FEF762E19243B00D27B9E /* picknick_tafel.jpg */; };
-		1D4FEF782E1926B600D27B9E /* Otto lenghi 1.referenceobject in Sources */ = {isa = PBXBuildFile; fileRef = 1D4FEF722E1923E100D27B9E /* Otto lenghi 1.referenceobject */; };
 		1D4FEF792E1926C400D27B9E /* picknick_tafel.referenceobject in Sources */ = {isa = PBXBuildFile; fileRef = 1D4FEF732E1923E100D27B9E /* picknick_tafel.referenceobject */; };
 		1D573AAE2E23C739006C14E8 /* visvijver_qoocam_8k30_8k_topaz.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 1D573AAD2E23C739006C14E8 /* visvijver_qoocam_8k30_8k_topaz.mp4 */; };
+		1DB198732E4253340025BF8A /* Otto lenghi 1.referenceobject in Sources */ = {isa = PBXBuildFile; fileRef = 1DB198722E4253340025BF8A /* Otto lenghi 1.referenceobject */; };
 		1DFEB0BB2E02B93E0081E5E7 /* RealityKitContent in Frameworks */ = {isa = PBXBuildFile; productRef = 1DFEB0BA2E02B93E0081E5E7 /* RealityKitContent */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		1D4FEF6D2E19232800D27B9E /* lancia_dag_360.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; name = lancia_dag_360.mp4; path = /Users/rick/xrdining/assets/videos/lancia_dag_360.mp4; sourceTree = "<absolute>"; };
 		1D4FEF6E2E19232800D27B9E /* philips-visvijver.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; name = "philips-visvijver.mp4"; path = "/Users/rick/xrdining/assets/videos/philips-visvijver.mp4"; sourceTree = "<absolute>"; };
-		1D4FEF722E1923E100D27B9E /* Otto lenghi 1.referenceobject */ = {isa = PBXFileReference; lastKnownFileType = file.referenceobject; name = "Otto lenghi 1.referenceobject"; path = "/Users/rick/VisionOS/ExploringObjectTrackingWithARKit/Reference Objects/Otto lenghi 1.referenceobject"; sourceTree = "<absolute>"; };
 		1D4FEF732E1923E100D27B9E /* picknick_tafel.referenceobject */ = {isa = PBXFileReference; lastKnownFileType = file.referenceobject; name = picknick_tafel.referenceobject; path = /Users/rick/xrdining/assets/referenceObjects/picknick_tafel.referenceobject; sourceTree = "<absolute>"; };
 		1D4FEF762E19243B00D27B9E /* picknick_tafel.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; name = picknick_tafel.jpg; path = /Users/rick/xrdining/assets/images/picknick_tafel.jpg; sourceTree = "<absolute>"; };
 		1D573AAD2E23C739006C14E8 /* visvijver_qoocam_8k30_8k_topaz.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; name = visvijver_qoocam_8k30_8k_topaz.mp4; path = /Users/rick/xrdining/assets/videos/visvijver_qoocam_8k30_8k_topaz.mp4; sourceTree = "<absolute>"; };
+		1DB198722E4253340025BF8A /* Otto lenghi 1.referenceobject */ = {isa = PBXFileReference; lastKnownFileType = file.referenceobject; name = "Otto lenghi 1.referenceobject"; path = "/Users/rick/VisionOS/ExploringObjectTrackingWithARKit/Reference Objects/Otto lenghi 1.referenceobject"; sourceTree = "<absolute>"; };
 		1DFEB0B52E02B93E0081E5E7 /* XRDining.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = XRDining.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		1DFEB0B92E02B93E0081E5E7 /* RealityKitContent */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = RealityKitContent; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -63,7 +63,7 @@
 		1D4FEF712E19237D00D27B9E /* objectTrackingFiles */ = {
 			isa = PBXGroup;
 			children = (
-				1D4FEF722E1923E100D27B9E /* Otto lenghi 1.referenceobject */,
+				1DB198722E4253340025BF8A /* Otto lenghi 1.referenceobject */,
 				1D4FEF732E1923E100D27B9E /* picknick_tafel.referenceobject */,
 			);
 			path = objectTrackingFiles;
@@ -194,7 +194,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				1D4FEF782E1926B600D27B9E /* Otto lenghi 1.referenceobject in Sources */,
+				1DB198732E4253340025BF8A /* Otto lenghi 1.referenceobject in Sources */,
 				1D4FEF792E1926C400D27B9E /* picknick_tafel.referenceobject in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
