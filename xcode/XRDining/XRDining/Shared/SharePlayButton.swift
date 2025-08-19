@@ -26,10 +26,13 @@ struct SharePlayButton<ActivityType: GroupActivity & Transferable & Sendable>: V
     
     let text: any StringProtocol
     let activity: ActivityType
+    let openImmersive: () -> Void
     
-    init(_ text: any StringProtocol, activity: ActivityType) {
+    init(_ text: any StringProtocol, activity: ActivityType, openImmersive : @escaping () -> Void) {
         self.text = text
         self.activity = activity
+        self.openImmersive = openImmersive
+        
         self.activitySharingView = ActivitySharingView {
             activity
         }
@@ -39,6 +42,24 @@ struct SharePlayButton<ActivityType: GroupActivity & Transferable & Sendable>: V
         ZStack {
             ShareLink(item: activity, preview: SharePreview(text)).hidden()
             
+            // The logic is as follows:
+            // initial, isActivitySharingViewPresented is false and this will
+            // set it to True when evaluating the Button.
+            // Because it is a state for this View, the Button will be redrawn.
+            // It will set isActivitySharingViewPresented to True, but it already was
+            // The Share sheet will be shown, which will enable choosing a recipient
+            // for the connection. When the connection has been established the sheet
+            // will disappear and isActivitySharingViewPresented will automatically be
+            // set to False. This will again evaluate the button, which will now find
+            // groupStateObserver.isEligibleForGroupSession set to True.
+            // This will start the shared activity.
+            // At this moment, the main window is shows slightly rotated because of
+            // the default spatial template which is being applied. This places
+            // the participants (2 in this case) next to eachother looking toward the
+            // screen. From a participant view, the other participant is either to the
+            // left or the right (order is not determined, this probably can be done
+            // using custom template and role assignment).
+    
             
             if !appModel.isSingleUser {
                 Button(text, systemImage: "shareplay") {
@@ -46,6 +67,8 @@ struct SharePlayButton<ActivityType: GroupActivity & Transferable & Sendable>: V
                         Task.detached {
                             do {
                                 _ = try await activity.activate()
+                                
+                                await openImmersive()
                             } catch {
                                 print("Error activating activity: \(error)")
                                 

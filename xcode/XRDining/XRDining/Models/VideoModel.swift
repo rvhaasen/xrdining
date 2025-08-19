@@ -22,7 +22,6 @@ class VideoModel {
         videoMaterial = VideoMaterial(avPlayer: player)
         self.player = player
     }
-
     func loadVideo(named name: String) throws {
         guard let url = Bundle.main.url(forResource: name, withExtension: "mp4") else {
             // In case video was playing, stop it

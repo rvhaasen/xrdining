@@ -46,6 +46,9 @@ final class SessionController {
         messenger = GroupSessionMessenger(session: session)
 
         systemCoordinator = groupSystemCoordinator
+        // RH It seems that next call does not apply the Spatial template yet,
+        // After session.join() the default template is applied (persons in circular area around the screen)
+        // Only after showing the immersive view, the template is applied...
         updateSpatialTemplatePreference()
         
         observeRemoteParticipantUpdates()

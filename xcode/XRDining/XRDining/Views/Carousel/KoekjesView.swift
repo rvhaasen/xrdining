@@ -24,9 +24,11 @@ struct KoekjesView: View {
         .frame(depth: 0)
     }
     
-    func updatePodiumPose(_ phraseDeckPodium: Entity) {
+    func updatePodiumPose(_ carousel: Entity) {
         //let podiumPosition = GameTemplate.playerPosition.translated(by: Vector3D(x: 0.6))
 //        phraseDeckPodium.position = .init(podiumPosition)
-        phraseDeckPodium.position = .init(Vector3D(x: 0.0, y: 1.5, z: appModel.screen2tableDistance+0.5))
+        carousel.position = .init(Vector3D(x: 0.0, y: 1.5, z: appModel.screen2tableDistance-0.5))
+        carousel.orientation = simd_quatf(angle: -.pi / 2, axis: SIMD3<Float>(0, 1, 0))
     }
 }
+

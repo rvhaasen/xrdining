@@ -11,14 +11,19 @@ import ARKit
 import RealityKitContent
 import AVFoundation
 import OSLog
+internal import Combine
 
 struct ImmersiveView: View {
+    @Environment(\.dismissImmersiveSpace) private var dismissImmersiveSpace
     
     @Environment(AppModel.self) var appModel
+    let timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
+    
+    @State private var count = 0
     
     var body: some View {
         @Bindable var appModel = appModel
-        
+ 
         RealityView { content in
             content.add(appModel.setupContentEntity())
             do {
@@ -90,35 +95,71 @@ struct ImmersiveView: View {
 //                mySphere.transform.rotation = simd_quatf(angle: Float(appModel.sphereAngle), axis: [1, 0, 0])
 //            }
         }
+        .onReceive(timer) { time in
+            print("Time, ticked, count is now \(count)")
+            
+            var videoFile = ""
+            
+            // State machine for demo
+            switch(count) {
+            case 0:
+                videoFile = "philips-visvijver"
+            case 20:
+                videoFile = "lancia_dag_360"
+            case 40:
+                videoFile = "visvijver_qoocam_8k30_8k_topaz"
+            case 60:
+                appModel.videoModel?.stop()
+                appModel.immersiveSpaceState = .inTransition
+                Task {
+                    await dismissImmersiveSpace()
+                }
+            default:
+                videoFile = ""
+            }
+            if (!videoFile.isEmpty ) {
+                do {
+                    try appModel.videoModel?.loadVideo(named: videoFile)
+                } catch {
+                    print("Could not load video file")
+                }
+            }
+            count += 1
+//            if (count == 180) {
+//                count = 0
+//            }
+        }
         .onAppear {
             Task {
                 await appModel.runARKitSession()
                 
                 // Wait for object anchor updates and maintain a dictionary of visualizations
                 // that are attached to those anchors.
-                for await anchorUpdate in appModel.objectTrackingProvider!.anchorUpdates {
-                    let anchor = anchorUpdate.anchor
-                    let id = anchor.id
-                    
-                    switch anchorUpdate.event {
-                    case .added:
-                        // Create a new visualization for the reference object that ARKit just detected.
-                        // The app displays the USDZ file that the reference object was trained on as
-                        // a wireframe on top of the real-world object, if the .referenceobject file contains
-                        // that USDZ file. If the original USDZ isn't available, the app displays a bounding box instead.
-                        let model = appModel.objectTracking.referenceObjectLoader.usdzsPerReferenceObjectID[anchor.referenceObject.id]
-                        let visualization = ObjectAnchorVisualization(for: anchor, withModel: model, withState: appModel.self)
-                        //visualization.entity.components.set(visibleObjectsGroup)
-                        appModel.objectVisualizations[id] = visualization
-                        appModel.contentRoot.addChild(visualization.entity)
-                        logInfo("TRACKING added \(anchor.referenceObject.name)")
-                    case .updated:
-                        //logger.info("TRACKING updated \(anchor.referenceObject.name)")
-                        appModel.objectVisualizations[id]?.update(with: anchor)
-                    case .removed:
-                        appModel.objectVisualizations[id]?.entity.removeFromParent()
-                        appModel.objectVisualizations.removeValue(forKey: id)
-                        logInfo("TRACKING removed \(anchor.referenceObject.name)")
+                if let objectTrackingProvider = appModel.objectTrackingProvider {
+                    for await anchorUpdate in objectTrackingProvider.anchorUpdates {
+                        let anchor = anchorUpdate.anchor
+                        let id = anchor.id
+                        
+                        switch anchorUpdate.event {
+                        case .added:
+                            // Create a new visualization for the reference object that ARKit just detected.
+                            // The app displays the USDZ file that the reference object was trained on as
+                            // a wireframe on top of the real-world object, if the .referenceobject file contains
+                            // that USDZ file. If the original USDZ isn't available, the app displays a bounding box instead.
+                            let model = appModel.objectTracking.referenceObjectLoader.usdzsPerReferenceObjectID[anchor.referenceObject.id]
+                            let visualization = ObjectAnchorVisualization(for: anchor, withModel: model, withState: appModel.self)
+                            //visualization.entity.components.set(visibleObjectsGroup)
+                            appModel.objectVisualizations[id] = visualization
+                            appModel.contentRoot.addChild(visualization.entity)
+                            logInfo("TRACKING added \(anchor.referenceObject.name)")
+                        case .updated:
+                            //logger.info("TRACKING updated \(anchor.referenceObject.name)")
+                            appModel.objectVisualizations[id]?.update(with: anchor)
+                        case .removed:
+                            appModel.objectVisualizations[id]?.entity.removeFromParent()
+                            appModel.objectVisualizations.removeValue(forKey: id)
+                            logInfo("TRACKING removed \(anchor.referenceObject.name)")
+                        }
                     }
                 }
             }

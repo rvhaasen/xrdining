@@ -13,6 +13,12 @@
 		1D4FEF792E1926C400D27B9E /* picknick_tafel.referenceobject in Sources */ = {isa = PBXBuildFile; fileRef = 1D4FEF732E1923E100D27B9E /* picknick_tafel.referenceobject */; };
 		1D573AAE2E23C739006C14E8 /* visvijver_qoocam_8k30_8k_topaz.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 1D573AAD2E23C739006C14E8 /* visvijver_qoocam_8k30_8k_topaz.mp4 */; };
 		1DB198732E4253340025BF8A /* Otto lenghi 1.referenceobject in Sources */ = {isa = PBXBuildFile; fileRef = 1DB198722E4253340025BF8A /* Otto lenghi 1.referenceobject */; };
+		1DF546FD2E4BB50300080DBD /* Auth in Frameworks */ = {isa = PBXBuildFile; productRef = 1DF546FC2E4BB50300080DBD /* Auth */; };
+		1DF546FF2E4BB50300080DBD /* Functions in Frameworks */ = {isa = PBXBuildFile; productRef = 1DF546FE2E4BB50300080DBD /* Functions */; };
+		1DF547012E4BB50300080DBD /* PostgREST in Frameworks */ = {isa = PBXBuildFile; productRef = 1DF547002E4BB50300080DBD /* PostgREST */; };
+		1DF547032E4BB50300080DBD /* Realtime in Frameworks */ = {isa = PBXBuildFile; productRef = 1DF547022E4BB50300080DBD /* Realtime */; };
+		1DF547052E4BB50300080DBD /* Storage in Frameworks */ = {isa = PBXBuildFile; productRef = 1DF547042E4BB50300080DBD /* Storage */; };
+		1DF547082E4BB51F00080DBD /* Supabase in Frameworks */ = {isa = PBXBuildFile; productRef = 1DF547072E4BB51F00080DBD /* Supabase */; };
 		1DFEB0BB2E02B93E0081E5E7 /* RealityKitContent in Frameworks */ = {isa = PBXBuildFile; productRef = 1DFEB0BA2E02B93E0081E5E7 /* RealityKitContent */; };
 /* End PBXBuildFile section */
 
@@ -53,6 +59,12 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				1DF547082E4BB51F00080DBD /* Supabase in Frameworks */,
+				1DF547052E4BB50300080DBD /* Storage in Frameworks */,
+				1DF547012E4BB50300080DBD /* PostgREST in Frameworks */,
+				1DF546FF2E4BB50300080DBD /* Functions in Frameworks */,
+				1DF546FD2E4BB50300080DBD /* Auth in Frameworks */,
+				1DF547032E4BB50300080DBD /* Realtime in Frameworks */,
 				1DFEB0BB2E02B93E0081E5E7 /* RealityKitContent in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -87,6 +99,13 @@
 			path = images;
 			sourceTree = "<group>";
 		};
+		1DF547062E4BB51F00080DBD /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 		1DFEB0AC2E02B93E0081E5E7 = {
 			isa = PBXGroup;
 			children = (
@@ -95,6 +114,7 @@
 				1D4FEF712E19237D00D27B9E /* objectTrackingFiles */,
 				1DFEB0B72E02B93E0081E5E7 /* XRDining */,
 				1DFEB0B82E02B93E0081E5E7 /* Packages */,
+				1DF547062E4BB51F00080DBD /* Frameworks */,
 				1DFEB0B62E02B93E0081E5E7 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -136,6 +156,12 @@
 			name = XRDining;
 			packageProductDependencies = (
 				1DFEB0BA2E02B93E0081E5E7 /* RealityKitContent */,
+				1DF546FC2E4BB50300080DBD /* Auth */,
+				1DF546FE2E4BB50300080DBD /* Functions */,
+				1DF547002E4BB50300080DBD /* PostgREST */,
+				1DF547022E4BB50300080DBD /* Realtime */,
+				1DF547042E4BB50300080DBD /* Storage */,
+				1DF547072E4BB51F00080DBD /* Supabase */,
 			);
 			productName = XRDining;
 			productReference = 1DFEB0B52E02B93E0081E5E7 /* XRDining.app */;
@@ -165,6 +191,9 @@
 			);
 			mainGroup = 1DFEB0AC2E02B93E0081E5E7;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				1DF546FB2E4BB50300080DBD /* XCRemoteSwiftPackageReference "supabase-swift" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 1DFEB0B62E02B93E0081E5E7 /* Products */;
 			projectDirPath = "";
@@ -408,7 +437,48 @@
 		};
 /* End XCConfigurationList section */
 
+/* Begin XCRemoteSwiftPackageReference section */
+		1DF546FB2E4BB50300080DBD /* XCRemoteSwiftPackageReference "supabase-swift" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/supabase-community/supabase-swift.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.5.1;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
 /* Begin XCSwiftPackageProductDependency section */
+		1DF546FC2E4BB50300080DBD /* Auth */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 1DF546FB2E4BB50300080DBD /* XCRemoteSwiftPackageReference "supabase-swift" */;
+			productName = Auth;
+		};
+		1DF546FE2E4BB50300080DBD /* Functions */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 1DF546FB2E4BB50300080DBD /* XCRemoteSwiftPackageReference "supabase-swift" */;
+			productName = Functions;
+		};
+		1DF547002E4BB50300080DBD /* PostgREST */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 1DF546FB2E4BB50300080DBD /* XCRemoteSwiftPackageReference "supabase-swift" */;
+			productName = PostgREST;
+		};
+		1DF547022E4BB50300080DBD /* Realtime */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 1DF546FB2E4BB50300080DBD /* XCRemoteSwiftPackageReference "supabase-swift" */;
+			productName = Realtime;
+		};
+		1DF547042E4BB50300080DBD /* Storage */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 1DF546FB2E4BB50300080DBD /* XCRemoteSwiftPackageReference "supabase-swift" */;
+			productName = Storage;
+		};
+		1DF547072E4BB51F00080DBD /* Supabase */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 1DF546FB2E4BB50300080DBD /* XCRemoteSwiftPackageReference "supabase-swift" */;
+			productName = Supabase;
+		};
 		1DFEB0BA2E02B93E0081E5E7 /* RealityKitContent */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = RealityKitContent;

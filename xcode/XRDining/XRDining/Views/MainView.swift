@@ -15,42 +15,79 @@ struct MainView: View {
     
     @Environment(\.scenePhase) private var scenePhase
     @Environment(\.dismissImmersiveSpace) private var dismissImmersiveSpace
+    @Environment(\.openImmersiveSpace) private var openImmersiveSpace
+
+    @ObservedObject
+    private var groupStateObserver = GroupStateObserver()
+    
+    //let timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
+    @State private var counter: Int = 0
     
     var body: some View {
         //ContentView()
         @Bindable var appModel = appModel
         
-        NavigationStack {
-            VStack {
-                WelcomeBanner().offset(y: 40)
-                NavigationLink {
-                    Configuration()
-                } label: {
-                    Text("Configuration")
-                }.padding(.bottom, 20)
-                //CarouselView()
-//                NavigationLink {
-//                    CarouselView()
-//                        .glassBackgroundEffect(.hidden)
-//                        .background(Color.clear)
-//                } label: {
-//                    Text("ShowMenu")
-//                }.padding(.bottom, 20)
-                ToggleImmersiveSpaceButton()
+        // openImmersive wil be used by several child-view, therefore
+        // define it as a closure to be passed to those child-views
+        let openImmersive: () -> Void = {
+            Task { @MainActor in
+                //openWindow(id: "koekjes")
+                
+                switch appModel.immersiveSpaceState {
+                    case .open:
+                        appModel.immersiveSpaceState = .inTransition
+                        appModel.videoModel?.stop()
+                        await dismissImmersiveSpace()
+                        // Don't set immersiveSpaceState to .closed because there
+                        // are multiple paths to ImmersiveView.onDisappear().
+                        // Only set .closed in ImmersiveView.onDisappear().
+
+                    case .closed:
+                        appModel.immersiveSpaceState = .inTransition
+                        switch await openImmersiveSpace(id: appModel.immersiveSpaceID) {
+                            case .opened:
+                                // Don't set immersiveSpaceState to .open because there
+                                // may be multiple paths to ImmersiveView.onAppear().
+                                // Only set .open in ImmersiveView.onAppear().
+                                break
+
+                            case .userCancelled, .error:
+                                // On error, we need to mark the immersive space
+                                // as closed because it failed to open.
+                                fallthrough
+                            @unknown default:
+                                // On unknown response, assume space did not open.
+                                appModel.immersiveSpaceState = .closed
+                        }
+
+                    case .inTransition:
+                        // This case should not ever happen because button is disabled for this case.
+                        break
+                }
             }
-            .font(.title2)
-            .padding(.bottom, 20)
-            
-            Divider()
-            
-            SharePlayButton("Share XRDining activity", activity: PersonasActivity())
+        }
+        NavigationStack {
+            if appModel.developerMode {
+                
+                VStack {
+                    WelcomeBanner().offset(y: 40)
+                    NavigationLink {
+                        Configuration()
+                    } label: {
+                        Text("Configuration")
+                    }.padding(.bottom, 20)
+                    ToggleImmersiveSpaceButton(openImmersive: openImmersive)
+                }
+                .font(.title2)
+                .padding(.bottom, 20)
+                
+                Divider()
+            }
+            SharePlayButton("Share XRDining activity", activity: PersonasActivity(), openImmersive: openImmersive)
                 .padding(.vertical, 50)
                 .font(.title2)
         }
         .task(observeGroupSessions)
-//        .task {
-//            openWindow(id: "koekjes")
-//        }
         .onChange(of: scenePhase, initial: true) {
                 print("HomeView scene phase: \(scenePhase)")
                 if scenePhase == .active {
@@ -70,8 +107,8 @@ struct MainView: View {
                     }
                 }
             }
-
     }
+    
     @Sendable
     func observeGroupSessions() async {
         for await session in PersonasActivity.sessions() {

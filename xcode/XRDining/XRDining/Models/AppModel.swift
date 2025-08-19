@@ -18,6 +18,7 @@ import OSLog
 @Observable @MainActor
 class AppModel {
     
+    let developerMode = true
     let arkitSession = ARKitSession()
     
     private var sessionTask: Task<Void, Never>?

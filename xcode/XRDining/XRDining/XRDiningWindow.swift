@@ -13,12 +13,12 @@ struct XRDiningWindow : Scene {
     var body: some Scene {
         WindowGroup {
             MainView()
-            .frame(width: 800, height: 500)
+            .frame(width: 800, height: 800)
         }
         .windowResizability(.contentSize)
 
-        WindowGroup(id: "koekjes") {
-            CarouselView()
-        }
+//        WindowGroup(id: "koekjes") {
+//            CarouselView()
+//        }
     }
 }
