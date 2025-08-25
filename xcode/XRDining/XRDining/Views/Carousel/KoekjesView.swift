@@ -19,6 +19,9 @@ struct KoekjesView: View {
         } attachments: {
             Attachment(id: "PhraseDeckView") {
                 CarouselView()
+                    .glassBackgroundEffect(      // ✅ gives you the translucent visionOS glass
+                      in: RoundedRectangle(cornerRadius: 24, style: .continuous)
+                    )
             }
         }
         .frame(depth: 0)

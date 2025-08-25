@@ -25,14 +25,13 @@ class VideoModel {
     func loadVideo(named name: String) throws {
         guard let url = Bundle.main.url(forResource: name, withExtension: "mp4") else {
             // In case video was playing, stop it
-            stop()
             throw VideoError.notFound
         }
 
         let item = AVPlayerItem(url: url)
         player.replaceCurrentItem(with: item)
 
-        // Remove old observer if needed
+//        // Remove old observer if needed
         NotificationCenter.default.removeObserver(self)
 
         // Add observer to loop

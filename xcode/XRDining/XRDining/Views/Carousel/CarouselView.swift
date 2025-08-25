@@ -21,6 +21,7 @@ struct CarouselView: View {
     var body: some View {
         ZStack {
             // Push the carousel to the front of the rectangular volume.
+            Text("Test tekst...")
             Spacer()
 
             VStackLayout(spacing: 20).depthAlignment(.front) {

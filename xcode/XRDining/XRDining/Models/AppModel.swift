@@ -30,6 +30,8 @@ class AppModel {
     var imageAnchors = [UUID: ImageAnchor]()
     var entityMap = [UUID: Entity]()
     
+    var mySphere: ModelEntity = ModelEntity()
+    
     // TODO: these 2 are most likely not needed, remove them
     var imageWidth: Float = 0
     var imageHeight: Float = 0

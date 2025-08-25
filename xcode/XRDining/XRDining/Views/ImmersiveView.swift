@@ -21,44 +21,46 @@ struct ImmersiveView: View {
     
     @State private var count = 0
     
+    let audio = AudioManager()
+    
     var body: some View {
         @Bindable var appModel = appModel
- 
+
         RealityView { content in
             content.add(appModel.setupContentEntity())
             do {
-                try appModel.videoModel?.loadVideo(named: appModel.selectedWorld.description)
+//                try appModel.videoModel?.loadVideo(named: appModel.selectedWorld.description)
+                try appModel.videoModel?.loadVideo(named: "domburg_duinen")
             } catch {
                 print("Could not load video file \"\(appModel.selectedWorld.description).mp4\"")
                 return
             }
-            //let entity = Entity()
-            guard let videoMaterial = appModel.videoModel?.videoMaterial else {
-                return
-            }
-            let mySphere = ModelEntity( mesh: .generateSphere(radius: 45),
-                materials: [videoMaterial])
-            mySphere.name = "sphere"
+            // Create placeholder material, it will be replaced by VideoMaterial when video is loaded
+            let mat  = SimpleMaterial(color: .white, isMetallic: false)
+            appModel.mySphere = ModelEntity( mesh: .generateSphere(radius: 45),
+                materials: [mat])
 
-            //entity.components.set(
-            //    ModelComponent(mesh: .generateSphere(radius: 45),
-            //                   materials: [videoMaterial])
-            //)
-            //entity.name = "sphere"
-            mySphere.scale *= .init(x:-1, y:1, z:1)
-            //let rotation = simd_quatf(angle: -.pi, axis: [0, 1, 0])
-            //mySphere.orientation = rotation * mySphere.orientation
+            appModel.mySphere.name = "sphere"
+
+            Task { await swapVideo(on: appModel.mySphere, materialIndex: 0, to: "domburg_duinen") }
+
+            appModel.mySphere.scale *= .init(x:-1, y:1, z:1)
+
+//            let rotation = simd_quatf(angle: -.pi, axis: [0, 1, 0])
+//            appModel.mySphere.orientation = rotation * appModel.mySphere.orientation
+
             if !appModel.isSingleUser {
                 //entity.position =  SIMD3<Float>(0, -0.5, 35)
-                mySphere.position = SIMD3<Float>(0, -appModel.seatHeightOffset, appModel.screen2tableDistance + 10.0)
+                appModel.mySphere.position = SIMD3<Float>(0, -appModel.seatHeightOffset, appModel.screen2tableDistance + 10.0)
             }
-            content.add(mySphere)
+            content.add(appModel.mySphere)
 //            let attachment = ViewAttachmentComponent(
 //                rootView: CarouselView()
 //            )
 //            let koekjes = Entity(components: attachment)
 //            koekjes.position = SIMD3<Float>(0, 0, -0.1)
 //            content.add(koekjes)
+            audio.playSound(named: "nordsea_with_gulls", fileExtension: "mp3")
              
         } update: { content in
             
@@ -74,11 +76,6 @@ struct ImmersiveView: View {
 //            }
             let _ = appModel.sphereAngle
             logger.info("SPHERE rotate in to \(appModel.sphereAngle)")
-//            if let rootEntity = content.entities.first,
-//               let mySphere = rootEntity.findEntity(named: "sphere") as? ModelEntity {
-//                logger.info("SPHERE object found")
-//                mySphere.transform.rotation = simd_quatf(angle: Float(appModel.sphereAngle), axis: [1, 0, 0])
-//            }
             if let foundEntity = content.entities.first(where: { $0.name == "sphere" }) {
                 // Use foundEntity
                 logger.info("SPHERE object found")
@@ -89,26 +86,44 @@ struct ImmersiveView: View {
                 let rotation2 = simd_quatf(angle: angle * 2.0 * .pi/360.0, axis: [0, 1, 0])
                 foundEntity.transform.rotation = rotation1 * rotation2
             }
-                
-//            if let mySphere = content.entities.first.findEntity(named: "sphere") {
-//                logger.info("SPHERE object found")
-//                mySphere.transform.rotation = simd_quatf(angle: Float(appModel.sphereAngle), axis: [1, 0, 0])
-//            }
         }
         .onReceive(timer) { time in
             print("Time, ticked, count is now \(count)")
             
             var videoFile = ""
+            var audioFile = ""
+            var audioFileExtension = ""
             
             // State machine for demo
             switch(count) {
-            case 0:
-                videoFile = "philips-visvijver"
-            case 20:
-                videoFile = "lancia_dag_360"
             case 40:
-                videoFile = "visvijver_qoocam_8k30_8k_topaz"
-            case 60:
+                //videoFile = "lancia_dag_360"
+                videoFile = "domburg_duinen_topaz"
+//                audioFile = "xrdining-main-meal"
+                audioFile = "nordsea_with_gulls"
+                audioFileExtension = "mp3"
+                //audio.playSound(named: "nordsea_with_gulls", fileExtension: "mp3")
+            case 80:
+//                videoFile = "visvijver_qoocam_8k30_8k_topaz"
+//                audioFile = "xrdining-desert"
+//                audioFileExtension = "m4a"
+                
+                videoFile = "domburg_bloemveld1_topaz"
+//                audioFile = "xrdining-main-meal"
+                audioFile = "soft-wind"
+                audioFileExtension = "mp3"
+            
+            case 120:
+                videoFile = "domburg_strand_topaz"
+                audioFile = "nordsea_with_gulls"
+                audioFileExtension = "mp3"
+
+            case 160:
+                videoFile = "domburg_duinen_bos_topaz"
+                audioFile = "nordsea_with_gulls"
+                audioFileExtension = "mp3"
+
+            case 200:
                 appModel.videoModel?.stop()
                 appModel.immersiveSpaceState = .inTransition
                 Task {
@@ -116,18 +131,23 @@ struct ImmersiveView: View {
                 }
             default:
                 videoFile = ""
+                audioFile = ""
             }
             if (!videoFile.isEmpty ) {
-                do {
-                    try appModel.videoModel?.loadVideo(named: videoFile)
-                } catch {
-                    print("Could not load video file")
-                }
+//                do {
+//                    appModel.videoModel?.stop()
+//                    try appModel.videoModel?.loadVideo(named: videoFile)
+//                } catch {
+//                    print("Could not load video file")
+//                }
+                Task { await swapVideo(on: appModel.mySphere, materialIndex: 0, to: videoFile) }
+            }
+            audio.stop()
+            
+            if (!audioFile.isEmpty) {
+                audio.playSound(named: audioFile, fileExtension: audioFileExtension)
             }
             count += 1
-//            if (count == 180) {
-//                count = 0
-//            }
         }
         .onAppear {
             Task {
