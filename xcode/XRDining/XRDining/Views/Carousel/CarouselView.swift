@@ -18,10 +18,12 @@ struct CarouselView: View {
     /// The point in space that's furthest back in the volume.
     @State private var backOfVolume: Point3D = .zero
     
+    let url: URL
+    
     var body: some View {
         ZStack {
             // Push the carousel to the front of the rectangular volume.
-            Text("Test tekst...")
+            PDFReaderView(url: url)
             Spacer()
 
             VStackLayout(spacing: 20).depthAlignment(.front) {
@@ -89,7 +91,7 @@ struct CarouselView: View {
 
 #Preview {
 //    let model = AppPhaseModel()
-    CarouselView()
+    CarouselView(url: Bundle.main.url(forResource: "factuur", withExtension: "pdf")!)
 //        .environment(model)
     
 }

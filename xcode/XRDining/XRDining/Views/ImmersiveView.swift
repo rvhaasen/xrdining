@@ -15,11 +15,13 @@ internal import Combine
 
 struct ImmersiveView: View {
     @Environment(\.dismissImmersiveSpace) private var dismissImmersiveSpace
+    @Environment(\.dismissWindow) private var dismissWindow
     
     @Environment(AppModel.self) var appModel
     let timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
     
     @State private var count = 0
+    @State private var video = VideoTextureController()
     
     let audio = AudioManager()
     
@@ -28,21 +30,14 @@ struct ImmersiveView: View {
 
         RealityView { content in
             content.add(appModel.setupContentEntity())
-            do {
-//                try appModel.videoModel?.loadVideo(named: appModel.selectedWorld.description)
-                try appModel.videoModel?.loadVideo(named: "domburg_duinen")
-            } catch {
-                print("Could not load video file \"\(appModel.selectedWorld.description).mp4\"")
-                return
-            }
             // Create placeholder material, it will be replaced by VideoMaterial when video is loaded
-            let mat  = SimpleMaterial(color: .white, isMetallic: false)
+            let mat  = SimpleMaterial(color: .black, isMetallic: false)
             appModel.mySphere = ModelEntity( mesh: .generateSphere(radius: 45),
                 materials: [mat])
 
             appModel.mySphere.name = "sphere"
 
-            Task { await swapVideo(on: appModel.mySphere, materialIndex: 0, to: "domburg_duinen") }
+//            Task { await swapVideo(on: appModel.mySphere, materialIndex: 0, to: "domburg_duinen") }
 
             appModel.mySphere.scale *= .init(x:-1, y:1, z:1)
 
@@ -96,14 +91,26 @@ struct ImmersiveView: View {
             
             // State machine for demo
             switch(count) {
-            case 40:
+            case 0:
+                //videoFile = "domburg_duinen"
+                videoFile = "visvijver_qoocam_8k30_8k_topaz"
+
+            case 20:
+                
+                appModel.videoModel?.stop()
+                appModel.immersiveSpaceState = .inTransition
+                Task {
+                    await dismissImmersiveSpace()
+                }
+                dismissWindow(id: "MainWindow")
+
                 //videoFile = "lancia_dag_360"
                 videoFile = "domburg_duinen_topaz"
 //                audioFile = "xrdining-main-meal"
                 audioFile = "nordsea_with_gulls"
                 audioFileExtension = "mp3"
                 //audio.playSound(named: "nordsea_with_gulls", fileExtension: "mp3")
-            case 80:
+            case 40:
 //                videoFile = "visvijver_qoocam_8k30_8k_topaz"
 //                audioFile = "xrdining-desert"
 //                audioFileExtension = "m4a"
@@ -113,21 +120,22 @@ struct ImmersiveView: View {
                 audioFile = "soft-wind"
                 audioFileExtension = "mp3"
             
-            case 120:
+            case 60:
                 videoFile = "domburg_strand_topaz"
                 audioFile = "nordsea_with_gulls"
                 audioFileExtension = "mp3"
 
-            case 160:
+            case 80:
                 videoFile = "domburg_duinen_bos_topaz"
                 audioFile = "nordsea_with_gulls"
                 audioFileExtension = "mp3"
 
-            case 200:
+            case 100:
                 appModel.videoModel?.stop()
                 appModel.immersiveSpaceState = .inTransition
                 Task {
                     await dismissImmersiveSpace()
+                    dismissWindow(id: "MainWindow")
                 }
             default:
                 videoFile = ""
@@ -141,12 +149,19 @@ struct ImmersiveView: View {
 //                    print("Could not load video file")
 //                }
                 Task { await swapVideo(on: appModel.mySphere, materialIndex: 0, to: videoFile) }
+                
+                // Alternative to be tried if there still is
+                // a race condition:
+//                await MainActor.run { video.attach(to: entity) }
+//                Task { await video.start(with: Bundle.main.url(forResource: "intro", withExtension: "mp4")!) }
+                
+                
             }
             audio.stop()
             
-            if (!audioFile.isEmpty) {
-                audio.playSound(named: audioFile, fileExtension: audioFileExtension)
-            }
+//            if (!audioFile.isEmpty) {
+//                audio.playSound(named: audioFile, fileExtension: audioFileExtension)
+//            }
             count += 1
         }
         .onAppear {
@@ -212,5 +227,3 @@ struct ImmersiveView: View {
     ImmersiveView()
         .environment(AppModel())
 }
-
-

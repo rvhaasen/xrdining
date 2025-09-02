@@ -16,6 +16,7 @@
 		1D4FEF772E1926AA00D27B9E /* picknick_tafel.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 1D4FEF762E19243B00D27B9E /* picknick_tafel.jpg */; };
 		1D4FEF792E1926C400D27B9E /* picknick_tafel.referenceobject in Sources */ = {isa = PBXBuildFile; fileRef = 1D4FEF732E1923E100D27B9E /* picknick_tafel.referenceobject */; };
 		1D573AAE2E23C739006C14E8 /* visvijver_qoocam_8k30_8k_topaz.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 1D573AAD2E23C739006C14E8 /* visvijver_qoocam_8k30_8k_topaz.mp4 */; };
+		1D6601022E5CCFA1008F9F9F /* factuur.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 1D6601012E5CCFA1008F9F9F /* factuur.pdf */; };
 		1D67BEBE2E5A2744001E6EE4 /* domburg_bloemveld1_topaz.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 1D67BEBD2E5A2744001E6EE4 /* domburg_bloemveld1_topaz.mp4 */; };
 		1D813C362E560DB5000EA0B5 /* xrdining-desert.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 1D813C352E560DB5000EA0B5 /* xrdining-desert.m4a */; };
 		1D813C382E560DCF000EA0B5 /* xrdining-main-meal.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 1D813C372E560DCF000EA0B5 /* xrdining-main-meal.m4a */; };
@@ -42,6 +43,7 @@
 		1D4FEF732E1923E100D27B9E /* picknick_tafel.referenceobject */ = {isa = PBXFileReference; lastKnownFileType = file.referenceobject; name = picknick_tafel.referenceobject; path = /Users/rick/xrdining/assets/referenceObjects/picknick_tafel.referenceobject; sourceTree = "<absolute>"; };
 		1D4FEF762E19243B00D27B9E /* picknick_tafel.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; name = picknick_tafel.jpg; path = /Users/rick/xrdining/assets/images/picknick_tafel.jpg; sourceTree = "<absolute>"; };
 		1D573AAD2E23C739006C14E8 /* visvijver_qoocam_8k30_8k_topaz.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; name = visvijver_qoocam_8k30_8k_topaz.mp4; path = /Users/rick/xrdining/assets/videos/visvijver_qoocam_8k30_8k_topaz.mp4; sourceTree = "<absolute>"; };
+		1D6601012E5CCFA1008F9F9F /* factuur.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; name = factuur.pdf; path = /Users/rick/xrdining/assets/docs/factuur.pdf; sourceTree = "<absolute>"; };
 		1D67BEBD2E5A2744001E6EE4 /* domburg_bloemveld1_topaz.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; name = domburg_bloemveld1_topaz.mp4; path = /Users/rick/xrdining/assets/videos/domburg_bloemveld1_topaz.mp4; sourceTree = "<absolute>"; };
 		1D813C352E560DB5000EA0B5 /* xrdining-desert.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; name = "xrdining-desert.m4a"; path = "/Users/rick/xrdining/assets/audio/xrdining-desert.m4a"; sourceTree = "<absolute>"; };
 		1D813C372E560DCF000EA0B5 /* xrdining-main-meal.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; name = "xrdining-main-meal.m4a"; path = "/Users/rick/xrdining/assets/audio/xrdining-main-meal.m4a"; sourceTree = "<absolute>"; };
@@ -136,6 +138,14 @@
 			path = images;
 			sourceTree = "<group>";
 		};
+		1D6601002E5CCF83008F9F9F /* pdfs */ = {
+			isa = PBXGroup;
+			children = (
+				1D6601012E5CCFA1008F9F9F /* factuur.pdf */,
+			);
+			path = pdfs;
+			sourceTree = "<group>";
+		};
 		1DF547062E4BB51F00080DBD /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
@@ -146,6 +156,7 @@
 		1DFEB0AC2E02B93E0081E5E7 = {
 			isa = PBXGroup;
 			children = (
+				1D6601002E5CCF83008F9F9F /* pdfs */,
 				1D01672F2E54D6F300C1783C /* Audio */,
 				1D4FEF752E19241D00D27B9E /* images */,
 				1D4FEF742E1923FB00D27B9E /* videos */,
@@ -259,6 +270,7 @@
 				1D2F53FA2E5B6011007CF945 /* soft-wind.mp3 in Resources */,
 				1D2F53F82E5B5F0F007CF945 /* domburg_strand_topaz.mp4 in Resources */,
 				1D2F53FC2E5B6A57007CF945 /* domburg_duinen_bos_topaz.mp4 in Resources */,
+				1D6601022E5CCFA1008F9F9F /* factuur.pdf in Resources */,
 				1DA2C5712E59178B00595A05 /* domburg_duinen_topaz.mp4 in Resources */,
 				1DA2C56F2E5907E100595A05 /* nordsea_with_gulls.mp3 in Resources */,
 			);

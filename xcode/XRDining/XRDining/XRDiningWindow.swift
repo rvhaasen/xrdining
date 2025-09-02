@@ -11,7 +11,7 @@ struct XRDiningWindow : Scene {
     @Environment(AppModel.self) var appModel
     
     var body: some Scene {
-        WindowGroup {
+        WindowGroup(id: "MainWindow") {
             MainView()
             .frame(width: 800, height: 800)
         }

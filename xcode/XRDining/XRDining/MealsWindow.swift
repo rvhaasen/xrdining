@@ -12,7 +12,7 @@ struct MealsWindow : Scene {
     
     var body: some Scene {
         WindowGroup {
-            CarouselView()
+            CarouselView(url: Bundle.main.url(forResource: "factuur", withExtension: "pdf")!)
 //            .frame(width: 800, height: 500)
         }
 //        .windowResizability(.contentSize)
