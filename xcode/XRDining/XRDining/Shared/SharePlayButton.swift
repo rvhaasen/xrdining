@@ -64,11 +64,16 @@ struct SharePlayButton<ActivityType: GroupActivity & Transferable & Sendable>: V
             if !appModel.isSingleUser {
                 Button(text, systemImage: "shareplay") {
                     if groupStateObserver.isEligibleForGroupSession {
+                        // The application screen will appear on the
+                        // left side of the 'caller' and on the right
+                        // side of the 'called'. It is important to know
+                        // the position in order to rotate the menu-screen
+                        // correctly toward each user
+                        appModel.spatialTemplateRole = .caller
                         Task.detached {
                             do {
                                 _ = try await activity.activate()
-                                
-                                await openImmersive()
+                                //await openImmersive()
                             } catch {
                                 print("Error activating activity: \(error)")
                                 

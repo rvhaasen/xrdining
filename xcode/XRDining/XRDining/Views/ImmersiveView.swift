@@ -92,17 +92,17 @@ struct ImmersiveView: View {
             // State machine for demo
             switch(count) {
             case 0:
-                //videoFile = "domburg_duinen"
-                videoFile = "visvijver_qoocam_8k30_8k_topaz"
+                videoFile = "domburg_duinen"
+                //videoFile = "visvijver_qoocam_8k30_8k_topaz"
 
-            case 20:
+            case 5:
                 
-                appModel.videoModel?.stop()
-                appModel.immersiveSpaceState = .inTransition
-                Task {
-                    await dismissImmersiveSpace()
-                }
-                dismissWindow(id: "MainWindow")
+                //appModel.videoModel?.stop()
+//                appModel.immersiveSpaceState = .inTransition
+//                Task {
+//                    await dismissImmersiveSpace()
+//                }
+//                dismissWindow(id: "MainWindow")
 
                 //videoFile = "lancia_dag_360"
                 videoFile = "domburg_duinen_topaz"
@@ -110,7 +110,7 @@ struct ImmersiveView: View {
                 audioFile = "nordsea_with_gulls"
                 audioFileExtension = "mp3"
                 //audio.playSound(named: "nordsea_with_gulls", fileExtension: "mp3")
-            case 40:
+            case 10:
 //                videoFile = "visvijver_qoocam_8k30_8k_topaz"
 //                audioFile = "xrdining-desert"
 //                audioFileExtension = "m4a"
@@ -120,18 +120,18 @@ struct ImmersiveView: View {
                 audioFile = "soft-wind"
                 audioFileExtension = "mp3"
             
-            case 60:
+            case 15:
                 videoFile = "domburg_strand_topaz"
                 audioFile = "nordsea_with_gulls"
                 audioFileExtension = "mp3"
 
-            case 80:
+            case 20:
                 videoFile = "domburg_duinen_bos_topaz"
                 audioFile = "nordsea_with_gulls"
                 audioFileExtension = "mp3"
 
-            case 100:
-                appModel.videoModel?.stop()
+            case 25:
+                //appModel.videoModel?.stop()
                 appModel.immersiveSpaceState = .inTransition
                 Task {
                     await dismissImmersiveSpace()

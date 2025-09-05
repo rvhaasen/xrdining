@@ -16,6 +16,7 @@ struct MainView: View {
     @Environment(\.scenePhase) private var scenePhase
     @Environment(\.dismissImmersiveSpace) private var dismissImmersiveSpace
     @Environment(\.openImmersiveSpace) private var openImmersiveSpace
+    @Environment(\.dismissWindow) private var dismissWindow
 
     @ObservedObject
     private var groupStateObserver = GroupStateObserver()
@@ -76,12 +77,23 @@ struct MainView: View {
                     } label: {
                         Text("Configuration")
                     }.padding(.bottom, 20)
+                    NavigationLink {
+                        StageView()
+                    } label: {
+                        Text("Configure stages")
+                    }.padding(.bottom, 20)
+                    NavigationLink {
+                        VideoPickerView()
+                    } label: {
+                        Text("VideoPicker")
+                    }.padding(.bottom, 20)
                     ToggleImmersiveSpaceButton(openImmersive: openImmersive)
                 }
                 .font(.title2)
                 .padding(.bottom, 20)
                 
                 Divider()
+                
             }
             SharePlayButton("Share XRDining activity", activity: PersonasActivity(), openImmersive: openImmersive)
                 .padding(.vertical, 50)
@@ -116,6 +128,9 @@ struct MainView: View {
             guard let sessionController else {
                 continue
             }
+            logInfo("New shareplay session, opening immersiveSpace")
+            await openImmersiveSpace(id: appModel.immersiveSpaceID)
+            
             appModel.sessionController = sessionController
 
             // Create a task to observe the group session state and clear the

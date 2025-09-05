@@ -26,10 +26,12 @@ struct KoekjesView: View {
         } attachments: {
             ForEach(menuTags, id: \.self) { tag in
                 Attachment(id: tag) {
-                    CarouselView(url: Bundle.main.url(forResource: "factuur", withExtension: "pdf")!)
-                    .glassBackgroundEffect(      // ✅ gives you the translucent visionOS glass
-                        in: RoundedRectangle(cornerRadius: 24, style: .continuous)
-                    )
+                    //CarouselView(url: Bundle.main.url(forResource: "factuur", withExtension: "pdf")!)
+                    CourseView(pdf: "factuur", modelName: "gebakske")
+//                    .glassBackgroundEffect(      // ✅ gives you the translucent visionOS glass
+//                        in: RoundedRectangle(cornerRadius: 24, style: .continuous)
+//                    )
+                    .frame(width: 300, height: 600)
                 }
             }
         }
@@ -46,7 +48,11 @@ struct KoekjesView: View {
 //      let podiumPosition = GameTemplate.playerPosition.translated(by: Vector3D(x: 0.6))
 //      phraseDeckPodium.position = .init(podiumPosition)
         entity.position = .init(Vector3D(x: 0.0, y: 1.5, z: appModel.screen2tableDistance-0.5))
-        entity.orientation = simd_quatf(angle: -.pi / 4, axis: SIMD3<Float>(0, 1, 0))
+        let angle : Float = appModel.spatialTemplateRole == .caller ? -.pi / 4 : .pi / 4
+        entity.orientation = simd_quatf(angle: angle, axis: SIMD3<Float>(0, 1, 0))
+
+        
+        //entity.orientation = simd_quatf(angle: -.pi / 4, axis: SIMD3<Float>(0, 1, 0))
     }
 }
 
