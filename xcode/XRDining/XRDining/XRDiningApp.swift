@@ -20,7 +20,6 @@ struct XRDiningApp: App {
         
             ImmersiveSpace(id: appModel.immersiveSpaceID) {
                 ZStack {
-                    KoekjesView()
                     ImmersiveView()
                 }
                 .onAppear {
