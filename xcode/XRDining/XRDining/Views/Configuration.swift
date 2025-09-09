@@ -47,7 +47,20 @@ struct Configuration: View {
                 Toggle(isOn: $appModel.doObjectDetection) {
                     Label("object detection", systemImage: "magnifyingglass")
                 }
-                Slider(value: $appModel.sphereAngle, in: -45...45, step: 1 )
+                HStack {
+                    Text("Rotation angle:")
+                    Text(String(format: "%.0f", appModel.sphereAngle))
+                }
+                Slider(value: $appModel.sphereAngle,
+                       in: -180...180,
+                       step: 1)
+                HStack {
+                    Text("Position offset")
+                    Text(String(format: "%.0f", appModel.positionOffset))
+                }
+                Slider(value: $appModel.positionOffset,
+                    in: -45...45,
+                    step: 1)
             }
             NavigationLink {
                 ObjectTrackingView()

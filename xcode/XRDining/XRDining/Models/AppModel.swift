@@ -42,6 +42,7 @@ class AppModel {
     var imageHeight: Float = 0
     
     var sphereAngle: Double = 0.0
+    var positionOffset: Double = 0.0
 
     // Detected images will create an entity that  detected images that will be added to contentRoot. For removing .removeFromParent is used on the particular entity. During setup of the reality-view the contentRoot is added to the scene.
     let contentRoot = Entity()

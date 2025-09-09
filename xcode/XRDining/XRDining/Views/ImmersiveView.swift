@@ -84,14 +84,14 @@ struct ImmersiveView: View {
             if let foundEntity = content.entities.first(where: { $0.name == "sphere" }) {
                 // Use foundEntity
                 logger.info("SPHERE object found")
-                let rotation1 = simd_quatf(angle: Float(appModel.sphereAngle/360 * 2 * .pi), axis: [0, 0, 1])
-                let angle = appModel.videos[appModel.selectedWorld]?.rotationDegrees ?? 0
+                //let rotation1 = simd_quatf(angle: Float(appModel.sphereAngle/360 * 2 * .pi), axis: [0, 0, 1])
+                //let angle = appModel.videos[appModel.selectedWorld]?.rotationDegrees ?? 0
                 //print(angle)
-                let rotation2 = simd_quatf(angle: angle * 2.0 * .pi/360.0, axis: [0, 1, 0])
-                //                foundEntity.transform.rotation = rotation1 * rotation2
+                let rotation2 = simd_quatf(angle: Float(appModel.sphereAngle - 90.0) * 2.0 * .pi/360.0, axis: [0, 1, 0])
+                //foundEntity.transform.rotation = rotation2
                 foundEntity.transform.rotation = rotation2
                 //let rotation2 = simd_quatf(angle: angle * 2.0 * .pi/360.0, axis: [0, 1, 0])
-                foundEntity.transform.translation = [0,0,Float(appModel.sphereAngle)]
+                foundEntity.transform.translation = [0,0,Float(appModel.positionOffset)]
             }
         }
         attachments: {
