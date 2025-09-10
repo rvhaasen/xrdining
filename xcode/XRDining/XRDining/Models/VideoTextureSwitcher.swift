@@ -57,5 +57,6 @@ func swapVideoFromUrl(on entity: ModelEntity, materialIndex: Int, to url: URL, v
     model.materials = mats
     entity.model = model               // assign back to trigger update
     player.volume = volume
+    player.automaticallyWaitsToMinimizeStalling = true
     player.play()
 }

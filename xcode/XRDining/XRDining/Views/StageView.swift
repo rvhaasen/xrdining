@@ -34,6 +34,7 @@ struct StageView: View {
     @State private var showNewItem = false
     @State private var insertAfterID: UUID? = nil
 
+
     var body: some View {
         @Bindable var appModel = appModel
         NavigationStack {
@@ -102,6 +103,9 @@ struct NewItemSheet: View {
     @State private var showBundleVideoPicker = false
     @State private var showBundleAudioPicker = false
 
+    @State private var pickedURL: URL?
+    @State private var hasSecurityScope = false
+    
     enum ImportType {
         case video
         case audio
@@ -188,8 +192,9 @@ struct NewItemSheet: View {
                 switch result {
                 case .success(let urls):
                     if let selected = urls.first {
+                        let url2 = handlePickedURL(selected)
                         if importType == .video {
-                            videoURL = selected
+                            videoURL = url2
                         } else if importType == .audio {
                             audioURL = selected
                         }
@@ -227,6 +232,31 @@ struct NewItemSheet: View {
             }
         }
     }
+    private func handlePickedURL(_ url: URL) -> URL {
+        // Clean up previous selection
+        stopAccessIfNeeded()
+
+        // Gain access to a security-scoped file from Files/iCloud
+        hasSecurityScope = url.startAccessingSecurityScopedResource()
+
+        // If this lives in iCloud, trigger download if needed
+        if FileManager.default.isUbiquitousItem(at: url) {
+            try? FileManager.default.startDownloadingUbiquitousItem(at: url)
+        }
+
+        //pickedURL = url
+        //player = AVPlayer(url: url)
+        //player?.automaticallyWaitsToMinimizeStalling = true
+        //player?.play()
+        return url
+    }
+
+    private func stopAccessIfNeeded() {
+        if hasSecurityScope, let pickedURL {
+            pickedURL.stopAccessingSecurityScopedResource()
+        }
+        hasSecurityScope = false
+    }
 }
 
 // MARK: - Editor (edit existing)
@@ -237,7 +267,10 @@ struct StageEditor: View {
     @State private var showBundleVideoPicker = false
     @State private var showBundleAudioPicker = false
     @State private var showFileImporter = false
-
+    
+    @State private var pickedURL: URL?
+    @State private var hasSecurityScope = false
+    
     enum ImportType {
         case video
         case audio
@@ -278,6 +311,7 @@ struct StageEditor: View {
                 }
                 Button {
                     importType = .video
+                    showFileImporter = true
                 } label: {
                     Label("Select Video", systemImage: "film")
                 }
@@ -291,6 +325,7 @@ struct StageEditor: View {
                 }
                 Button {
                     importType = .audio
+                    showFileImporter = true
                 } label: {
                     Label("Select Audio", systemImage: "music.note")
                 }
@@ -309,8 +344,9 @@ struct StageEditor: View {
             switch result {
             case .success(let urls):
                 if let selected = urls.first {
+                    let url2 = handlePickedURL(selected)
                     if importType == .video {
-                        item.videoURL = selected
+                        item.videoURL = url2
                     } else if importType == .audio {
                         item.audioURL = selected
                     }
@@ -361,6 +397,31 @@ struct StageEditor: View {
                 showBundleAudioPicker = false
             }
         }
+    }
+    private func handlePickedURL(_ url: URL) -> URL {
+        // Clean up previous selection
+        stopAccessIfNeeded()
+
+        // Gain access to a security-scoped file from Files/iCloud
+        hasSecurityScope = url.startAccessingSecurityScopedResource()
+
+        // If this lives in iCloud, trigger download if needed
+        if FileManager.default.isUbiquitousItem(at: url) {
+            try? FileManager.default.startDownloadingUbiquitousItem(at: url)
+        }
+
+        //pickedURL = url
+        //player = AVPlayer(url: url)
+        //player?.automaticallyWaitsToMinimizeStalling = true
+        //player?.play()
+        return url
+    }
+
+    private func stopAccessIfNeeded() {
+        if hasSecurityScope, let pickedURL {
+            pickedURL.stopAccessingSecurityScopedResource()
+        }
+        hasSecurityScope = false
     }
 }
 
