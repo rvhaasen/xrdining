@@ -20,22 +20,25 @@ struct StageItem: Identifiable, Equatable {
     var title: String
     var videoURL: URL? = nil
     var audioURL: URL? = nil
-    //var audioURL: URL? = nil
     var duration: Int = 0
     var notes: String = ""
     var isEnabled: Bool = true
+    var volume: Float = 1.0
 }
 
 // MARK: - Main List
 struct StageView: View {
-    @State private var items: [StageItem] = []
+    @Environment(AppModel.self) var appModel
+    
+    //@State private var items: [StageItem] = []
     @State private var showNewItem = false
     @State private var insertAfterID: UUID? = nil
 
     var body: some View {
+        @Bindable var appModel = appModel
         NavigationStack {
             List {
-                ForEach($items) { $item in
+                ForEach($appModel.items) { $item in
                     NavigationLink {
                         StageEditor(item: $item)
                     } label: {
@@ -55,8 +58,8 @@ struct StageView: View {
                         }
                     }
                 }
-                .onDelete { items.remove(atOffsets: $0) }
-                .onMove { items.move(fromOffsets: $0, toOffset: $1) }
+                .onDelete { appModel.items.remove(atOffsets: $0) }
+                .onMove { appModel.items.move(fromOffsets: $0, toOffset: $1) }
             }
             .navigationTitle("Stages")
             .toolbar {
@@ -72,10 +75,10 @@ struct StageView: View {
             }
             .sheet(isPresented: $showNewItem) {
                 NewItemSheet { newItem in
-                    if let afterID = insertAfterID, let index = items.firstIndex(where: { $0.id == afterID }) {
-                        items.insert(newItem, at: index + 1)
+                    if let afterID = insertAfterID, let index = appModel.items.firstIndex(where: { $0.id == afterID }) {
+                        appModel.items.insert(newItem, at: index + 1)
                     } else {
-                        items.append(newItem)
+                        appModel.items.append(newItem)
                     }
                     insertAfterID = nil
                 }
@@ -93,6 +96,7 @@ struct NewItemSheet: View {
     @State private var notes: String = ""
     @State private var isEnabled = true
     @State private var duration: Int = 0
+    @State private var volume: Float = 1.0
     @State private var showFileImporter = false
     @State private var fileImportError: Error? = nil
     @State private var showBundleVideoPicker = false
@@ -119,6 +123,14 @@ struct NewItemSheet: View {
                         Spacer()
                         TextField("0", value: $duration, format: .number)
                             .keyboardType(.numberPad)
+                            .multilineTextAlignment(.trailing)
+                            .frame(width: 80)
+                    }
+                    HStack {
+                        Text("Volume")
+                        Spacer()
+                        TextField("1.0", value: $volume, format: .number)
+                            .keyboardType(.decimalPad)
                             .multilineTextAlignment(.trailing)
                             .frame(width: 80)
                     }
@@ -164,7 +176,8 @@ struct NewItemSheet: View {
                                         audioURL: audioURL,
                                         duration: duration,
                                         notes: notes,
-                                        isEnabled: isEnabled)
+                                        isEnabled: isEnabled,
+                                        volume: volume )
                         onSave(item)
                         dismiss()
                     }
@@ -249,6 +262,14 @@ struct StageEditor: View {
                     Spacer()
                     TextField("0", value: $item.duration, format: .number)
                         .keyboardType(.numberPad)
+                        .multilineTextAlignment(.trailing)
+                        .frame(width: 80)
+                }
+                HStack {
+                    Text("Volume")
+                    Spacer()
+                    TextField("1.0", value: $item.volume, format: .number)
+                        .keyboardType(.decimalPad)
                         .multilineTextAlignment(.trailing)
                         .frame(width: 80)
                 }

@@ -14,8 +14,8 @@
             filePath = "XRDining/Views/ImmersiveView.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "88"
-            endingLineNumber = "88"
+            startingLineNumber = "95"
+            endingLineNumber = "95"
             landmarkName = "body"
             landmarkType = "24">
          </BreakpointContent>
@@ -30,8 +30,8 @@
             filePath = "XRDining/Views/ImmersiveView.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "198"
-            endingLineNumber = "198"
+            startingLineNumber = "235"
+            endingLineNumber = "235"
             landmarkName = "body"
             landmarkType = "24">
          </BreakpointContent>
@@ -46,8 +46,8 @@
             filePath = "XRDining/Views/ImmersiveView.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "193"
-            endingLineNumber = "193"
+            startingLineNumber = "230"
+            endingLineNumber = "230"
             landmarkName = "body"
             landmarkType = "24">
          </BreakpointContent>
@@ -78,8 +78,8 @@
             filePath = "XRDining/Models/AppModel.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "190"
-            endingLineNumber = "190"
+            startingLineNumber = "193"
+            endingLineNumber = "193"
             landmarkName = "runARKitSession()"
             landmarkType = "7">
          </BreakpointContent>
@@ -113,6 +113,38 @@
             startingLineNumber = "50"
             endingLineNumber = "50"
             landmarkName = "gameSyncStore"
+            landmarkType = "24">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "CD73800C-33C8-4AF4-BC89-998180F7B38B"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "XRDining/Views/ImmersiveView.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "152"
+            endingLineNumber = "152"
+            landmarkName = "body"
+            landmarkType = "24">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "2C839E89-EEAB-4B13-80E5-DF3DDE756912"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "XRDining/Views/ImmersiveView.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "41"
+            endingLineNumber = "41"
+            landmarkName = "body"
             landmarkType = "24">
          </BreakpointContent>
       </BreakpointProxy>

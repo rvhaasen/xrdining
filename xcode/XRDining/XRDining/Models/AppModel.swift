@@ -18,6 +18,9 @@ import OSLog
 @Observable @MainActor
 class AppModel {
     
+    // Definition of scenes
+    var items: [StageItem] = []
+    
     // Set default role to called,
     // For the initiator of it will be set to 'called'
     // This will define the seating positions

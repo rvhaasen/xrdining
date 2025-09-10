@@ -25,15 +25,21 @@ func makePlayer(url: URL, loop: Bool = true) async -> AVPlayer {
     return player
 }
 
+
 @MainActor
 //func swapVideo(on entity: ModelEntity, materialIndex: Int, to url: URL) async {
 func swapVideo(on entity: ModelEntity, materialIndex: Int, to videoName: String) async {
-
+    
     guard let url = Bundle.main.url(forResource: videoName, withExtension: "mp4") else {
         // In case video was playing, stop it
         print("Could not load video \(videoName)")
         return
     }
+    await swapVideoFromUrl(on: entity, materialIndex: materialIndex, to: url)
+}
+@MainActor
+func swapVideoFromUrl(on entity: ModelEntity, materialIndex: Int, to url: URL, volume: Float = 1.0) async {
+
     guard var model = entity.model,
           model.materials.indices.contains(materialIndex) else { return }
 
@@ -50,5 +56,6 @@ func swapVideo(on entity: ModelEntity, materialIndex: Int, to videoName: String)
 
     model.materials = mats
     entity.model = model               // assign back to trigger update
+    player.volume = volume
     player.play()
 }
