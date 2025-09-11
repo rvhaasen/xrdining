@@ -12,9 +12,6 @@
 		1D4FEF772E1926AA00D27B9E /* picknick_tafel.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 1D4FEF762E19243B00D27B9E /* picknick_tafel.jpg */; };
 		1D4FEF792E1926C400D27B9E /* picknick_tafel.referenceobject in Sources */ = {isa = PBXBuildFile; fileRef = 1D4FEF732E1923E100D27B9E /* picknick_tafel.referenceobject */; };
 		1D6601022E5CCFA1008F9F9F /* factuur.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 1D6601012E5CCFA1008F9F9F /* factuur.pdf */; };
-		1D7201832E6EFA2D000142CB /* friesland_10s_topaz.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 1D72017E2E6EF6FD000142CB /* friesland_10s_topaz.mp4 */; };
-		1D7201862E6F62CD000142CB /* valkenburg_geul_10s_topaz.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 1D7201842E6F62CD000142CB /* valkenburg_geul_10s_topaz.mp4 */; };
-		1D7201872E6F62CD000142CB /* valkenburg_rand_10s_topaz.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 1D7201852E6F62CD000142CB /* valkenburg_rand_10s_topaz.mp4 */; };
 		1D813C362E560DB5000EA0B5 /* xrdining-desert.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 1D813C352E560DB5000EA0B5 /* xrdining-desert.m4a */; };
 		1D813C382E560DCF000EA0B5 /* xrdining-main-meal.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 1D813C372E560DCF000EA0B5 /* xrdining-main-meal.m4a */; };
 		1DA2C56F2E5907E100595A05 /* nordsea_with_gulls.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 1DA2C56E2E5907E100595A05 /* nordsea_with_gulls.mp3 */; };
@@ -28,9 +25,6 @@
 		1D4FEF732E1923E100D27B9E /* picknick_tafel.referenceobject */ = {isa = PBXFileReference; lastKnownFileType = file.referenceobject; name = picknick_tafel.referenceobject; path = /Users/rick/xrdining/assets/referenceObjects/picknick_tafel.referenceobject; sourceTree = "<absolute>"; };
 		1D4FEF762E19243B00D27B9E /* picknick_tafel.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; name = picknick_tafel.jpg; path = /Users/rick/xrdining/assets/images/picknick_tafel.jpg; sourceTree = "<absolute>"; };
 		1D6601012E5CCFA1008F9F9F /* factuur.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; name = factuur.pdf; path = /Users/rick/xrdining/assets/docs/factuur.pdf; sourceTree = "<absolute>"; };
-		1D72017E2E6EF6FD000142CB /* friesland_10s_topaz.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; name = friesland_10s_topaz.mp4; path = /Users/rick/xrdining/assets/videos/friesland_10s_topaz.mp4; sourceTree = "<absolute>"; };
-		1D7201842E6F62CD000142CB /* valkenburg_geul_10s_topaz.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; name = valkenburg_geul_10s_topaz.mp4; path = /Users/rick/xrdining/assets/videos/valkenburg_geul_10s_topaz.mp4; sourceTree = "<absolute>"; };
-		1D7201852E6F62CD000142CB /* valkenburg_rand_10s_topaz.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; name = valkenburg_rand_10s_topaz.mp4; path = /Users/rick/xrdining/assets/videos/valkenburg_rand_10s_topaz.mp4; sourceTree = "<absolute>"; };
 		1D813C352E560DB5000EA0B5 /* xrdining-desert.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; name = "xrdining-desert.m4a"; path = "/Users/rick/xrdining/assets/audio/xrdining-desert.m4a"; sourceTree = "<absolute>"; };
 		1D813C372E560DCF000EA0B5 /* xrdining-main-meal.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; name = "xrdining-main-meal.m4a"; path = "/Users/rick/xrdining/assets/audio/xrdining-main-meal.m4a"; sourceTree = "<absolute>"; };
 		1DA2C56E2E5907E100595A05 /* nordsea_with_gulls.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = nordsea_with_gulls.mp3; path = /Users/rick/xrdining/assets/audio/nordsea_with_gulls.mp3; sourceTree = "<absolute>"; };
@@ -97,9 +91,6 @@
 		1D4FEF742E1923FB00D27B9E /* videos */ = {
 			isa = PBXGroup;
 			children = (
-				1D7201842E6F62CD000142CB /* valkenburg_geul_10s_topaz.mp4 */,
-				1D7201852E6F62CD000142CB /* valkenburg_rand_10s_topaz.mp4 */,
-				1D72017E2E6EF6FD000142CB /* friesland_10s_topaz.mp4 */,
 			);
 			path = videos;
 			sourceTree = "<group>";
@@ -225,11 +216,8 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				1D7201862E6F62CD000142CB /* valkenburg_geul_10s_topaz.mp4 in Resources */,
-				1D7201872E6F62CD000142CB /* valkenburg_rand_10s_topaz.mp4 in Resources */,
 				1D4FEF772E1926AA00D27B9E /* picknick_tafel.jpg in Resources */,
 				1D813C362E560DB5000EA0B5 /* xrdining-desert.m4a in Resources */,
-				1D7201832E6EFA2D000142CB /* friesland_10s_topaz.mp4 in Resources */,
 				1D813C382E560DCF000EA0B5 /* xrdining-main-meal.m4a in Resources */,
 				1D0167312E54D8D600C1783C /* xrdining-starter.m4a in Resources */,
 				1D2F53FA2E5B6011007CF945 /* soft-wind.mp3 in Resources */,

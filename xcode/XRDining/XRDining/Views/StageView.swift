@@ -473,3 +473,7 @@ struct BundleAudioPicker: View {
     }
 }
 
+#Preview {
+    StageView()
+        .environment(AppModel())
+}

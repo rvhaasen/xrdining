@@ -115,12 +115,7 @@ struct ImmersiveView: View {
         }
         .onReceive(timer) { time in
             print("Time, ticked, count is now \(count), nextStage is \(nextStageAt)")
-            
-            var videoFile = ""
-            var audioFile = ""
-            var audioFileExtension = ""
-            //var nextStageAt: Int = 0
-            
+                        
             var videoFileURL: URL?
             
 
@@ -135,95 +130,34 @@ struct ImmersiveView: View {
                     Task { await swapVideoFromUrl(on: appModel.mySphere, materialIndex: 0, to: videoFileURL!, volume: item.volume) }
                 } else {
                     //appModel.videoModel?.stop()
-                    print("Done, exiting immersive space")
+                    if let model = appModel.mySphere.model,
+                       model.materials.indices.contains(0),
+                       let videoMaterial = model.materials[0] as? VideoMaterial {
+                        if let player = videoMaterial.avPlayer {
+                            player.pause()
+                        }
+                        else {
+                            logInfo("Cannot stop videoplayer, no player found")
+                        }
+                    }
+                    logInfo("Done, exiting immersive space")
                     appModel.immersiveSpaceState = .inTransition
                     Task {
                         await dismissImmersiveSpace()
-                        dismissWindow(id: "MainWindow")
                     }
+                    dismissWindow(id: "MainWindow")
                 }
             }
             count += 1
             
+            //                    //audioFileExtension = "mp3"
+            //                    //audio.playSound(named: "nordsea_with_gulls", fileExtension: "mp3")
+            //            audio.stop()
+            //
+            //            if (!audioFile.isEmpty) {
+            //                audio.playSound(named: audioFile, fileExtension: audioFileExtension)
             
             
-            
-            
-//            if (false) {
-//                // State machine for demo
-//                switch(count) {
-//                case 0:
-//                    videoFile = "valkenburg_geul_10s_topaz"
-//                    //videoFile = "visvijver_qoocam_8k30_8k_topaz"
-//
-//                case 10:
-//                    
-//                    //appModel.videoModel?.stop()
-//    //                appModel.immersiveSpaceState = .inTransition
-//    //                Task {
-//    //                    await dismissImmersiveSpace()
-//    //                }
-//    //                dismissWindow(id: "MainWindow")
-//
-//                    //videoFile = "lancia_dag_360"
-//                    videoFile = "valkenburg_rand_10s_topaz"
-//    //                audioFile = "xrdining-main-meal"
-//                    //audioFile = "nordsea_with_gulls"
-//                    //audioFileExtension = "mp3"
-//                    //audio.playSound(named: "nordsea_with_gulls", fileExtension: "mp3")
-//                case 21:
-//    //                videoFile = "visvijver_qoocam_8k30_8k_topaz"
-//    //                audioFile = "xrdining-desert"
-//    //                audioFileExtension = "m4a"
-//                    
-//                    videoFile = "friesland_10s_topaz"
-//    //                audioFile = "xrdining-main-meal"
-//                    //audioFile = "soft-wind"
-//                    //audioFileExtension = "mp3"
-//                
-//    //            case 15:
-//    //                videoFile = "domburg_strand_topaz"
-//    //                audioFile = "nordsea_with_gulls"
-//    //                audioFileExtension = "mp3"
-//    //
-//    //            case 20:
-//    //                videoFile = "domburg_duinen_bos_topaz"
-//    //                audioFile = "nordsea_with_gulls"
-//    //                audioFileExtension = "mp3"
-//
-//                case 400:
-//                    //appModel.videoModel?.stop()
-//                    appModel.immersiveSpaceState = .inTransition
-//                    Task {
-//                        await dismissImmersiveSpace()
-//                        dismissWindow(id: "MainWindow")
-//                    }
-//                default:
-//                    videoFile = ""
-//                    audioFile = ""
-//                }
-//                if (!videoFile.isEmpty ) {
-//                    //                do {
-//                    //                    appModel.videoModel?.stop()
-//                    //                    try appModel.videoModel?.loadVideo(named: videoFile)
-//                    //                } catch {
-//                    //                    print("Could not load video file")
-//                    //                }
-//                    Task { await swapVideo(on: appModel.mySphere, materialIndex: 0, to: videoFile) }
-//                    
-//                    // Alternative to be tried if there still is
-//                    // a race condition:
-//                    //                await MainActor.run { video.attach(to: entity) }
-//                    //                Task { await video.start(with: Bundle.main.url(forResource: "intro", withExtension: "mp4")!) }
-//                }
-//                
-//            }
-//            audio.stop()
-//            
-////            if (!audioFile.isEmpty) {
-////                audio.playSound(named: audioFile, fileExtension: audioFileExtension)
-////            }
-//            count += 1
         }
         .onAppear {
             Task {
