@@ -27,7 +27,6 @@ func makePlayer(url: URL, loop: Bool = true) async -> AVPlayer {
 
 
 @MainActor
-//func swapVideo(on entity: ModelEntity, materialIndex: Int, to url: URL) async {
 func swapVideo(on entity: ModelEntity, materialIndex: Int, to videoName: String) async {
     
     guard let url = Bundle.main.url(forResource: videoName, withExtension: "mp4") else {
@@ -43,6 +42,9 @@ func swapVideoFromUrl(on entity: ModelEntity, materialIndex: Int, to url: URL, v
     guard var model = entity.model,
           model.materials.indices.contains(materialIndex) else { return }
 
+    let oldMaterial = model.materials[materialIndex] as? VideoMaterial
+    let oldPlayer = oldMaterial?.avPlayer
+    
     let player = await makePlayer(url: url, loop: true)
 
     // Rebuild the material with the new player
@@ -59,4 +61,10 @@ func swapVideoFromUrl(on entity: ModelEntity, materialIndex: Int, to url: URL, v
     player.volume = volume
     player.automaticallyWaitsToMinimizeStalling = true
     player.play()
+    // 4) Defer teardown to avoid race with the renderer
+    //    (next runloop tick or ~1 frame)
+    DispatchQueue.main.async {
+        _ = oldMaterial    // keep referenced until here
+        _ = oldPlayer // optional: oldPlayer?.replaceCurrentItem(with: nil)
+    }
 }

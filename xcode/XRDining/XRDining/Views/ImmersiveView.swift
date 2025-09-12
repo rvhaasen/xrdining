@@ -94,7 +94,7 @@ struct ImmersiveView: View {
                 //let rotation1 = simd_quatf(angle: Float(appModel.sphereAngle/360 * 2 * .pi), axis: [0, 0, 1])
                 //let angle = appModel.videos[appModel.selectedWorld]?.rotationDegrees ?? 0
                 //print(angle)
-                let rotation2 = simd_quatf(angle: Float(appModel.sphereAngle - 90.0) * 2.0 * .pi/360.0, axis: [0, 1, 0])
+                let rotation2 = simd_quatf(angle: Float(appModel.sphereAngle) * 2.0 * .pi/360.0, axis: [0, 1, 0])
                 //foundEntity.transform.rotation = rotation2
                 foundEntity.transform.rotation = rotation2
                 //let rotation2 = simd_quatf(angle: angle * 2.0 * .pi/360.0, axis: [0, 1, 0])
@@ -115,40 +115,51 @@ struct ImmersiveView: View {
         }
         .onReceive(timer) { time in
             print("Time, ticked, count is now \(count), nextStage is \(nextStageAt)")
-                        
+            defer {
+                count += 1
+            }
             var videoFileURL: URL?
             
 
             if (count == nextStageAt) {
                 print("Count reached to next stage: \(nextStageAt)")
                 if let item = it.next() as StageItem? {
-                    videoFileURL = item.videoURL
-                    print("Duration for next video is \(item.duration) seconds")
-                    nextStageAt += item.duration
-                    print("Next stage at \(nextStageAt)")
-                    print("Running next video...")
-                    Task { await swapVideoFromUrl(on: appModel.mySphere, materialIndex: 0, to: videoFileURL!, volume: item.volume) }
-                } else {
-                    //appModel.videoModel?.stop()
-                    if let model = appModel.mySphere.model,
-                       model.materials.indices.contains(0),
-                       let videoMaterial = model.materials[0] as? VideoMaterial {
-                        if let player = videoMaterial.avPlayer {
-                            player.pause()
-                        }
-                        else {
-                            logInfo("Cannot stop videoplayer, no player found")
-                        }
+                    
+                    guard item.isEnabled else {
+                        audio.stop()
+                        
+                        // ffwd to next scene
+                        nextStageAt += 1
+                        return
                     }
+                    videoFileURL = item.videoURL
+                    nextStageAt += item.duration
+                    print("Duration for next video is \(item.duration) seconds")
+                    appModel.sphereAngle = Double(item.rotation)
+                    print("Next stage at \(nextStageAt)")
+                    
+                    if let audioURL = item.audioURL {
+                        audio.playSound(url: audioURL)
+                    }
+                    else {
+                        // Stop currently playing audio
+                        audio.stop()
+                    }
+                    print("Running next video...")
+                    startVideo(url: videoFileURL, volume: item.volume)
+                    //Task { await swapVideoFromUrl(on: appModel.mySphere, materialIndex: 0, to: videoFileURL!, volume: item.volume) }
+                } else {
+                    stopVideo()
                     logInfo("Done, exiting immersive space")
+                    audio.stop()
                     appModel.immersiveSpaceState = .inTransition
                     Task {
                         await dismissImmersiveSpace()
                     }
-                    dismissWindow(id: "MainWindow")
+                    //dismissWindow(id: "MainWindow")
                 }
             }
-            count += 1
+
             
             //                    //audioFileExtension = "mp3"
             //                    //audio.playSound(named: "nordsea_with_gulls", fileExtension: "mp3")
@@ -212,8 +223,25 @@ struct ImmersiveView: View {
         //.id(appModel.selectedWorld)
     }
     
-    
-    
+    func startVideo( url: URL?, volume: Float) {
+        guard let url else {
+            logInfo("Cannot play video")
+            return
+        }
+        Task { await swapVideoFromUrl(on: appModel.mySphere, materialIndex: 0, to: url, volume: volume) }
+    }
+    func stopVideo() {
+        if let model = appModel.mySphere.model,
+           model.materials.indices.contains(0),
+           let videoMaterial = model.materials[0] as? VideoMaterial {
+            if let player = videoMaterial.avPlayer {
+                player.pause()
+            }
+            else {
+                logInfo("Cannot stop videoplayer, no player found")
+            }
+        }
+    }
     
     func visitAllEntities(_ entity: Entity, action: (Entity) -> Void) {
         action(entity)

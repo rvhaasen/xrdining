@@ -21,6 +21,7 @@ struct StageItem: Identifiable, Equatable {
     var videoURL: URL? = nil
     var audioURL: URL? = nil
     var duration: Int = 0
+    var rotation: Int = 0
     var notes: String = ""
     var isEnabled: Bool = true
     var volume: Float = 1.0
@@ -96,7 +97,8 @@ struct NewItemSheet: View {
     @State private var audioURL: URL?
     @State private var notes: String = ""
     @State private var isEnabled = true
-    @State private var duration: Int = 0
+    @State private var duration: Int = 10
+    @State private var rotation: Int = 0
     @State private var volume: Float = 1.0
     @State private var showFileImporter = false
     @State private var fileImportError: Error? = nil
@@ -131,10 +133,10 @@ struct NewItemSheet: View {
                             .frame(width: 80)
                     }
                     HStack {
-                        Text("Volume")
+                        Text("Rotation")
                         Spacer()
-                        TextField("1.0", value: $volume, format: .number)
-                            .keyboardType(.decimalPad)
+                        TextField("0", value: $rotation, format: .number)
+                            .keyboardType(.numbersAndPunctuation)
                             .multilineTextAlignment(.trailing)
                             .frame(width: 80)
                     }
@@ -147,11 +149,19 @@ struct NewItemSheet: View {
                     } label: {
                         Label("Select Video", systemImage: "film")
                     }
-                    Button {
-                        showBundleVideoPicker = true
-                    } label: {
-                        Label("Select video from Bundle...", systemImage: "shippingbox")
+                    HStack {
+                        Text("Volume of audio in video (0 .. 1.0)")
+                        Spacer()
+                        TextField("1.0", value: $volume, format: .number)
+                            .keyboardType(.decimalPad)
+                            .multilineTextAlignment(.trailing)
+                            .frame(width: 80)
                     }
+//                    Button {
+//                        showBundleVideoPicker = true
+//                    } label: {
+//                        Label("Select video from Bundle...", systemImage: "shippingbox")
+//                    }
                     if let url = audioURL {
                         Text(url.lastPathComponent).font(.footnote).foregroundStyle(.secondary)
                     }
@@ -161,11 +171,11 @@ struct NewItemSheet: View {
                     } label: {
                         Label("Select Audio", systemImage: "music.note")
                     }
-                    Button {
-                        showBundleAudioPicker = true
-                    } label: {
-                        Label("Select audio from Bundle...", systemImage: "shippingbox")
-                    }
+//                    Button {
+//                        showBundleAudioPicker = true
+//                    } label: {
+//                        Label("Select audio from Bundle...", systemImage: "shippingbox")
+//                    }
                 }
             }
             .navigationTitle("New Stage")
@@ -179,9 +189,10 @@ struct NewItemSheet: View {
                                         videoURL: videoURL,
                                         audioURL: audioURL,
                                         duration: duration,
+                                        rotation: rotation,
                                         notes: notes,
                                         isEnabled: isEnabled,
-                                        volume: volume )
+                                        volume: volume)
                         onSave(item)
                         dismiss()
                     }
@@ -299,10 +310,10 @@ struct StageEditor: View {
                         .frame(width: 80)
                 }
                 HStack {
-                    Text("Volume")
+                    Text("Rotation")
                     Spacer()
-                    TextField("1.0", value: $item.volume, format: .number)
-                        .keyboardType(.decimalPad)
+                    TextField("0", value: $item.rotation, format: .number)
+                        .keyboardType(.numbersAndPunctuation)
                         .multilineTextAlignment(.trailing)
                         .frame(width: 80)
                 }
@@ -315,11 +326,19 @@ struct StageEditor: View {
                 } label: {
                     Label("Select Video", systemImage: "film")
                 }
-                Button {
-                    showBundleVideoPicker = true
-                } label: {
-                    Label("Select video from Bundle...", systemImage: "shippingbox")
+                HStack {
+                    Text("Volume of audio in video (0 .. 1.0)")
+                    Spacer()
+                    TextField("1.0", value: $item.volume, format: .number)
+                        .keyboardType(.decimalPad)
+                        .multilineTextAlignment(.trailing)
+                        .frame(width: 80)
                 }
+//                Button {
+//                    showBundleVideoPicker = true
+//                } label: {
+//                    Label("Select video from Bundle...", systemImage: "shippingbox")
+//                }
                 if let url = item.audioURL {
                     Text(url.lastPathComponent).font(.footnote).foregroundStyle(.secondary)
                 }
@@ -329,11 +348,11 @@ struct StageEditor: View {
                 } label: {
                     Label("Select Audio", systemImage: "music.note")
                 }
-                Button {
-                    showBundleAudioPicker = true
-                } label: {
-                    Label("Select audio from Bundle...", systemImage: "shippingbox")
-                }
+//                Button {
+//                    showBundleAudioPicker = true
+//                } label: {
+//                    Label("Select audio from Bundle...", systemImage: "shippingbox")
+//                }
             }
         }
         .navigationTitle("Edit Item")
