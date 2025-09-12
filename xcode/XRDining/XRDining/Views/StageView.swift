@@ -26,6 +26,7 @@ struct StageItem: Identifiable, Equatable {
     var isEnabled: Bool = true
     var volume: Float = 1.0
     var pdfURL: URL? = nil
+    var usdzURL: URL? = nil
 }
 
 // MARK: - Main List
@@ -102,6 +103,7 @@ struct NewItemSheet: View {
     @State private var rotation: Int = 0
     @State private var volume: Float = 1.0
     @State private var pdfURL: URL?
+    @State private var usdzURL: URL?
     @State private var showFileImporter = false
     @State private var fileImportError: Error? = nil
     @State private var showBundleVideoPicker = false
@@ -114,6 +116,7 @@ struct NewItemSheet: View {
         case video
         case audio
         case pdf
+        case usdz
     }
     @State private var importType: ImportType? = nil
 
@@ -143,14 +146,16 @@ struct NewItemSheet: View {
                             .multilineTextAlignment(.trailing)
                             .frame(width: 80)
                     }
-                    if let url = videoURL {
-                        Text(url.lastPathComponent).font(.footnote).foregroundStyle(.secondary)
-                    }
-                    Button {
-                        importType = .video
-                        showFileImporter = true
-                    } label: {
-                        Label("Select Video", systemImage: "film")
+                    HStack {
+                        Button {
+                            importType = .video
+                            showFileImporter = true
+                        } label: {
+                            Label("Select Video", systemImage: "film")
+                        }
+                        if let url = videoURL {
+                            Text(url.lastPathComponent).font(.footnote).foregroundStyle(.secondary)
+                        }
                     }
                     HStack {
                         Text("Volume of audio in video (0 .. 1.0)")
@@ -165,23 +170,38 @@ struct NewItemSheet: View {
 //                    } label: {
 //                        Label("Select video from Bundle...", systemImage: "shippingbox")
 //                    }
-                    if let url = audioURL {
-                        Text(url.lastPathComponent).font(.footnote).foregroundStyle(.secondary)
+                    HStack {
+                        Button {
+                            importType = .audio
+                            showFileImporter = true
+                        } label: {
+                            Label("Select Audio", systemImage: "music.note")
+                        }
+                        if let url = audioURL {
+                            Text(url.lastPathComponent).font(.footnote).foregroundStyle(.secondary)
+                        }
                     }
-                    Button {
-                        importType = .audio
-                        showFileImporter = true
-                    } label: {
-                        Label("Select Audio", systemImage: "music.note")
+                    HStack {
+                        Button {
+                            importType = .pdf
+                            showFileImporter = true
+                        } label: {
+                            Label("Select meal description PDF", systemImage: "doc.richtext.fill")
+                        }
+                        if let url = pdfURL {
+                            Text(url.lastPathComponent).font(.footnote).foregroundStyle(.secondary)
+                        }
                     }
-                    if let url = pdfURL {
-                        Text(url.lastPathComponent).font(.footnote).foregroundStyle(.secondary)
-                    }
-                    Button {
-                        importType = .pdf
-                        showFileImporter = true
-                    } label: {
-                        Label("Select meal description PDF", systemImage: "doc.richtext.fill")
+                    HStack {
+                        Button {
+                            importType = .usdz
+                            showFileImporter = true
+                        } label: {
+                            Label("Select meal 3D model", systemImage: "cube")
+                        }
+                        if let url = usdzURL {
+                            Text(url.lastPathComponent).font(.footnote).foregroundStyle(.secondary)
+                        }
                     }
 //                    Button {
 //                        showBundleAudioPicker = true
@@ -205,7 +225,8 @@ struct NewItemSheet: View {
                                         notes: notes,
                                         isEnabled: isEnabled,
                                         volume: volume,
-                                        pdfURL: pdfURL)
+                                        pdfURL: pdfURL,
+                                        usdzURL: usdzURL)
                         onSave(item)
                         dismiss()
                     }
@@ -217,6 +238,7 @@ struct NewItemSheet: View {
                 case .video: [.movie]
                 case .audio: [.audio]
                 case .pdf:   [.pdf]
+                case .usdz:  [.usdz]
                 case nil:    []
                 }
             }(), allowsMultipleSelection: false) { result in
@@ -224,12 +246,17 @@ struct NewItemSheet: View {
                 case .success(let urls):
                     if let selected = urls.first {
                         let url2 = handlePickedURL(selected)
-                        if importType == .video {
+                        switch importType {
+                        case .video:
                             videoURL = url2
-                        } else if importType == .audio {
+                        case .audio:
                             audioURL = selected
-                        } else if importType == .pdf {
+                        case .pdf:
                             pdfURL = selected
+                        case .usdz:
+                            usdzURL = selected
+                        case nil:
+                            break
                         }
                     }
                 case .failure(let error):
@@ -308,6 +335,7 @@ struct StageEditor: View {
         case video
         case audio
         case pdf
+        case usdz
     }
     @State private var importType: ImportType? = nil
 
@@ -340,14 +368,16 @@ struct StageEditor: View {
                         .multilineTextAlignment(.trailing)
                         .frame(width: 80)
                 }
-                if let url = item.videoURL {
-                    Text(url.lastPathComponent).font(.footnote).foregroundStyle(.secondary)
-                }
-                Button {
-                    importType = .video
-                    showFileImporter = true
-                } label: {
-                    Label("Select Video", systemImage: "film")
+                HStack {
+                    Button {
+                        importType = .video
+                        showFileImporter = true
+                    } label: {
+                        Label("Select Video", systemImage: "film")
+                    }
+                    if let url = item.videoURL {
+                        Text(url.lastPathComponent).font(.footnote).foregroundStyle(.secondary)
+                    }
                 }
                 HStack {
                     Text("Volume of audio in video (0 .. 1.0)")
@@ -362,23 +392,38 @@ struct StageEditor: View {
 //                } label: {
 //                    Label("Select video from Bundle...", systemImage: "shippingbox")
 //                }
-                if let url = item.audioURL {
-                    Text(url.lastPathComponent).font(.footnote).foregroundStyle(.secondary)
+                HStack {
+                    Button {
+                        importType = .audio
+                        showFileImporter = true
+                    } label: {
+                        Label("Select Audio", systemImage: "music.note")
+                    }
+                    if let url = item.audioURL {
+                        Text(url.lastPathComponent).font(.footnote).foregroundStyle(.secondary)
+                    }
                 }
-                Button {
-                    importType = .audio
-                    showFileImporter = true
-                } label: {
-                    Label("Select Audio", systemImage: "music.note")
+                HStack {
+                    Button {
+                        importType = .pdf
+                        showFileImporter = true
+                    } label: {
+                        Label("Select meal description PDF", systemImage: "doc.richtext.fill")
+                    }
+                    if let url = item.pdfURL {
+                        Text(url.lastPathComponent).font(.footnote).foregroundStyle(.secondary)
+                    }
                 }
-                if let url = item.pdfURL {
-                    Text(url.lastPathComponent).font(.footnote).foregroundStyle(.secondary)
-                }
-                Button {
-                    importType = .pdf
-                    showFileImporter = true
-                } label: {
-                    Label("Select meal description PDF", systemImage: "doc.richtext.fill")
+                HStack {
+                    Button {
+                        importType = .usdz
+                        showFileImporter = true
+                    } label: {
+                        Label("Select meal 3D model", systemImage: "cube")
+                    }
+                    if let url = item.usdzURL {
+                        Text(url.lastPathComponent).font(.footnote).foregroundStyle(.secondary)
+                    }
                 }
 //                Button {
 //                    showBundleAudioPicker = true
@@ -396,6 +441,7 @@ struct StageEditor: View {
             case .video: [.movie]
             case .audio: [.audio]
             case .pdf:   [.pdf]
+            case .usdz: [.usdz]
             case nil:    []
             }
         }(), allowsMultipleSelection: false) { result in
@@ -403,12 +449,17 @@ struct StageEditor: View {
             case .success(let urls):
                 if let selected = urls.first {
                     let url2 = handlePickedURL(selected)
-                    if importType == .video {
+                    switch importType {
+                    case .video:
                         item.videoURL = url2
-                    } else if importType == .audio {
+                    case .audio:
                         item.audioURL = selected
-                    } else if importType == .pdf {
+                    case .pdf:
                         item.pdfURL = selected
+                    case .usdz:
+                        item.usdzURL = selected
+                    case nil:
+                        break
                     }
                 }
             case .failure(let error):
@@ -537,3 +588,4 @@ struct BundleAudioPicker: View {
     StageView()
         .environment(AppModel())
 }
+

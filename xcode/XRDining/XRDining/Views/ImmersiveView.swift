@@ -84,7 +84,7 @@ struct ImmersiveView: View {
                 //foundEntity.transform.rotation = rotation2
                 foundEntity.transform.rotation = rotation2
                 //let rotation2 = simd_quatf(angle: angle * 2.0 * .pi/360.0, axis: [0, 1, 0])
-                foundEntity.transform.translation = [0,0,Float(appModel.positionOffset)]
+                foundEntity.transform.translation = [0,0, Float(appModel.positionOffset)]
             }
         }
         attachments: {
@@ -103,25 +103,7 @@ struct ImmersiveView: View {
             defer {
                 count += 1
             }
-            
-            if (count == 5) {
-                guard let root = scene.root else { return }
-                let e = Entity()
-                e.position = [0, 0.06, 0.1]  // stack upward a bit
-                e.components.set(
-                    ViewAttachmentComponent(
-                        rootView:
-                            //Model3D(url: Bundle.main.url(forResource: "gebakske", withExtension: "usdz")!)
-                            Text("Hi there!!!")
-                            //CourseView(pdf: "factuur", modelName: "gebakske")
-                                .padding(8)
-                                .glassBackgroundEffect()
-                    )
-                )
-                root.addChild(e)
-            }
-            
-
+                        
             if (count == nextStageAt) {
                 print("Count reached to next stage: \(nextStageAt)")
                 if let item = it.next() as StageItem? {
@@ -260,7 +242,7 @@ struct ImmersiveView: View {
     // orient the menu-view
     //
     func updatePodiumPose(_ entity: Entity) {
-        entity.position = .init(Vector3D(x: 0.0, y: 1.5, z: appModel.screen2tableDistance-0.5))
+        entity.position = .init(Vector3D(x: -0.5, y: 1.0, z: appModel.screen2tableDistance-0.5))
         let angle : Float = appModel.spatialTemplateRole == .caller ? -.pi / 4 : .pi / 4
         entity.orientation = simd_quatf(angle: angle, axis: SIMD3<Float>(0, 1, 0))
     }
