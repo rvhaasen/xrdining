@@ -25,6 +25,7 @@ struct StageItem: Identifiable, Equatable {
     var notes: String = ""
     var isEnabled: Bool = true
     var volume: Float = 1.0
+    var pdfURL: URL? = nil
 }
 
 // MARK: - Main List
@@ -100,6 +101,7 @@ struct NewItemSheet: View {
     @State private var duration: Int = 10
     @State private var rotation: Int = 0
     @State private var volume: Float = 1.0
+    @State private var pdfURL: URL?
     @State private var showFileImporter = false
     @State private var fileImportError: Error? = nil
     @State private var showBundleVideoPicker = false
@@ -111,6 +113,7 @@ struct NewItemSheet: View {
     enum ImportType {
         case video
         case audio
+        case pdf
     }
     @State private var importType: ImportType? = nil
 
@@ -171,6 +174,15 @@ struct NewItemSheet: View {
                     } label: {
                         Label("Select Audio", systemImage: "music.note")
                     }
+                    if let url = pdfURL {
+                        Text(url.lastPathComponent).font(.footnote).foregroundStyle(.secondary)
+                    }
+                    Button {
+                        importType = .pdf
+                        showFileImporter = true
+                    } label: {
+                        Label("Select meal description PDF", systemImage: "doc.richtext.fill")
+                    }
 //                    Button {
 //                        showBundleAudioPicker = true
 //                    } label: {
@@ -192,14 +204,22 @@ struct NewItemSheet: View {
                                         rotation: rotation,
                                         notes: notes,
                                         isEnabled: isEnabled,
-                                        volume: volume)
+                                        volume: volume,
+                                        pdfURL: pdfURL)
                         onSave(item)
                         dismiss()
                     }
                     .disabled(title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
                 }
             }
-            .fileImporter(isPresented: $showFileImporter, allowedContentTypes: importType == .video ? [.movie] : [.audio], allowsMultipleSelection: false) { result in
+            .fileImporter(isPresented: $showFileImporter, allowedContentTypes: {
+                switch importType {
+                case .video: [.movie]
+                case .audio: [.audio]
+                case .pdf:   [.pdf]
+                case nil:    []
+                }
+            }(), allowsMultipleSelection: false) { result in
                 switch result {
                 case .success(let urls):
                     if let selected = urls.first {
@@ -208,6 +228,8 @@ struct NewItemSheet: View {
                             videoURL = url2
                         } else if importType == .audio {
                             audioURL = selected
+                        } else if importType == .pdf {
+                            pdfURL = selected
                         }
                     }
                 case .failure(let error):
@@ -285,6 +307,7 @@ struct StageEditor: View {
     enum ImportType {
         case video
         case audio
+        case pdf
     }
     @State private var importType: ImportType? = nil
 
@@ -348,6 +371,15 @@ struct StageEditor: View {
                 } label: {
                     Label("Select Audio", systemImage: "music.note")
                 }
+                if let url = item.pdfURL {
+                    Text(url.lastPathComponent).font(.footnote).foregroundStyle(.secondary)
+                }
+                Button {
+                    importType = .pdf
+                    showFileImporter = true
+                } label: {
+                    Label("Select meal description PDF", systemImage: "doc.richtext.fill")
+                }
 //                Button {
 //                    showBundleAudioPicker = true
 //                } label: {
@@ -359,7 +391,14 @@ struct StageEditor: View {
 //        .onDisappear {
 //            item.duration = duration
 //        }
-        .fileImporter(isPresented: $showFileImporter, allowedContentTypes: importType == .video ? [.movie] : [.audio], allowsMultipleSelection: false) { result in
+        .fileImporter(isPresented: $showFileImporter, allowedContentTypes: {
+            switch importType {
+            case .video: [.movie]
+            case .audio: [.audio]
+            case .pdf:   [.pdf]
+            case nil:    []
+            }
+        }(), allowsMultipleSelection: false) { result in
             switch result {
             case .success(let urls):
                 if let selected = urls.first {
@@ -368,6 +407,8 @@ struct StageEditor: View {
                         item.videoURL = url2
                     } else if importType == .audio {
                         item.audioURL = selected
+                    } else if importType == .pdf {
+                        item.pdfURL = selected
                     }
                 }
             case .failure(let error):

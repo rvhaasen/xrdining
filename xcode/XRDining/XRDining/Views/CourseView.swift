@@ -14,15 +14,13 @@ line1
 line2                
 """
 struct CourseView: View {
-    var pdf: String
+    var url: URL
     var modelName: String
     
     var body: some View {
         
-        let pdfUrl = Bundle.main.url(forResource: pdf, withExtension: "pdf")!
-        
         VStackLayout(spacing: 30).depthAlignment(.back)  {
-            PDFReaderView(url: pdfUrl)
+            PDFReaderView(url: url)
                 //.frame(width: 300, height: 350)
             //Spacer()
             Model3D(named: modelName, bundle: realityKitContentBundle) { model in
@@ -60,6 +58,7 @@ struct CourseView: View {
 }
 
 #Preview {
-    CourseView(pdf: "factuur", modelName: "gebakske")
+    let pdfUrl = Bundle.main.url(forResource: "factuur", withExtension: "pdf")!
+    CourseView(url: pdfUrl, modelName: "gebakske")
         .frame(width: 300, height: 600)
 }

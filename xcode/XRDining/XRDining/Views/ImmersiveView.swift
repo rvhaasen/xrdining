@@ -23,10 +23,11 @@ struct ImmersiveView: View {
     @State private var count = 0
     @State private var video = VideoTextureController()
     
+    @State private var scene = SceneRef()
     
     let audio = AudioManager()
     
-    let menuTags = ["menu-starter", "menu-main", "menu-dessert"]
+    let menuTags = ["a", "b", "c"]
     
     var body: some View {
         @Bindable var appModel = appModel
@@ -36,14 +37,24 @@ struct ImmersiveView: View {
         var nextStageAt: Int = 0
         
         RealityView { content, attachments  in
-            
-            for tag in menuTags {
+                        
+            // Add menu objects
+//            for tag in menuTags {
+//                attachments.entity(for: tag).map(content.add)
+//            }
+            for tag in appModel.items.map(\.title) {
                 attachments.entity(for: tag).map(content.add)
             }
-            for tag in menuTags {
+
+            // Set the rotation such that the menu faces the user (caller/callee)
+//            for tag in menuTags {
+//                attachments.entity(for: tag).map(updatePodiumPose(_:))
+//            }
+            for tag in appModel.items.map(\.title) {
                 attachments.entity(for: tag).map(updatePodiumPose(_:))
             }
             content.add(appModel.setupContentEntity())
+            
             // Create placeholder material, it will be replaced by VideoMaterial when video is loaded
             let mat  = SimpleMaterial(color: .black, isMetallic: false)
             appModel.mySphere = ModelEntity( mesh: .generateSphere(radius: 45),
@@ -51,13 +62,8 @@ struct ImmersiveView: View {
             
             appModel.mySphere.name = "sphere"
             
-            //            Task { await swapVideo(on: appModel.mySphere, materialIndex: 0, to: "domburg_duinen") }
-            
             appModel.mySphere.scale *= .init(x:-1, y:1, z:1)
-            
-            //            let rotation = simd_quatf(angle: -.pi, axis: [0, 1, 0])
-            //            appModel.mySphere.orientation = rotation * appModel.mySphere.orientation
-            
+                        
             if !appModel.isSingleUser {
                 //entity.position =  SIMD3<Float>(0, -0.5, 35)
                 // +10 is specific for visvijver scene, in order to put the users
@@ -67,33 +73,13 @@ struct ImmersiveView: View {
             
             content.add(appModel.mySphere)
             
-            //currentItem = it.next() as StageItem
-
-            //            audio.playSound(named: "nordsea_with_gulls", fileExtension: "mp3")
-            
         }
         update: { content, attachments in
             
-            //            for entity in content.entities {
-            //                // Do something with each entity
-            //                logger.info("UPDATE closure: Entity name: \(entity.name)")
-            //            }
-            //            logger.info("Now recursive:")
-            //            for root in content.entities {
-            //                visitAllEntities(root) { entity in
-            //                    logger.info("Entity name: \(entity.name)")
-            //                }
-            //            }
-
-            
-            let _ = appModel.sphereAngle
             logger.info("SPHERE rotate in to \(appModel.sphereAngle)")
             if let foundEntity = content.entities.first(where: { $0.name == "sphere" }) {
                 // Use foundEntity
                 logger.info("SPHERE object found")
-                //let rotation1 = simd_quatf(angle: Float(appModel.sphereAngle/360 * 2 * .pi), axis: [0, 0, 1])
-                //let angle = appModel.videos[appModel.selectedWorld]?.rotationDegrees ?? 0
-                //print(angle)
                 let rotation2 = simd_quatf(angle: Float(appModel.sphereAngle) * 2.0 * .pi/360.0, axis: [0, 1, 0])
                 //foundEntity.transform.rotation = rotation2
                 foundEntity.transform.rotation = rotation2
@@ -102,14 +88,13 @@ struct ImmersiveView: View {
             }
         }
         attachments: {
-            ForEach(menuTags, id: \.self) { tag in
-                Attachment(id: tag) {
-                    //CarouselView(url: Bundle.main.url(forResource: "factuur", withExtension: "pdf")!)
-                    CourseView(pdf: "factuur", modelName: "gebakske")
-//                    .glassBackgroundEffect(      // ✅ gives you the translucent visionOS glass
-//                        in: RoundedRectangle(cornerRadius: 24, style: .continuous)
-//                    )
-                    .frame(width: 300, height: 600)
+            ForEach(appModel.items.filter { $0.pdfURL != nil} ) { item in
+                Attachment(id: item.title) {
+                    CourseView(url: item.pdfURL!, modelName: "gebakske")
+                    //                    .glassBackgroundEffect(      // ✅ gives you the translucent visionOS glass
+                    //                        in: RoundedRectangle(cornerRadius: 24, style: .continuous)
+                    //                    )
+                        .frame(width: 300, height: 600)
                 }
             }
         }
@@ -118,7 +103,23 @@ struct ImmersiveView: View {
             defer {
                 count += 1
             }
-            var videoFileURL: URL?
+            
+            if (count == 5) {
+                guard let root = scene.root else { return }
+                let e = Entity()
+                e.position = [0, 0.06, 0.1]  // stack upward a bit
+                e.components.set(
+                    ViewAttachmentComponent(
+                        rootView:
+                            //Model3D(url: Bundle.main.url(forResource: "gebakske", withExtension: "usdz")!)
+                            Text("Hi there!!!")
+                            //CourseView(pdf: "factuur", modelName: "gebakske")
+                                .padding(8)
+                                .glassBackgroundEffect()
+                    )
+                )
+                root.addChild(e)
+            }
             
 
             if (count == nextStageAt) {
@@ -132,7 +133,6 @@ struct ImmersiveView: View {
                         nextStageAt += 1
                         return
                     }
-                    videoFileURL = item.videoURL
                     nextStageAt += item.duration
                     print("Duration for next video is \(item.duration) seconds")
                     appModel.sphereAngle = Double(item.rotation)
@@ -146,9 +146,13 @@ struct ImmersiveView: View {
                         audio.stop()
                     }
                     print("Running next video...")
-                    startVideo(url: videoFileURL, volume: item.volume)
-                    //Task { await swapVideoFromUrl(on: appModel.mySphere, materialIndex: 0, to: videoFileURL!, volume: item.volume) }
+                    
+                    if let url = item.videoURL {
+                        startVideo(url: url, volume: item.volume)
+                    }
                 } else {
+                    // Last stage has been processed, stop all, close views which puts the
+                    // application to background
                     stopVideo()
                     logInfo("Done, exiting immersive space")
                     audio.stop()
@@ -156,7 +160,7 @@ struct ImmersiveView: View {
                     Task {
                         await dismissImmersiveSpace()
                     }
-                    //dismissWindow(id: "MainWindow")
+                    dismissWindow(id: "MainWindow")
                 }
             }
 
@@ -260,6 +264,10 @@ struct ImmersiveView: View {
         let angle : Float = appModel.spatialTemplateRole == .caller ? -.pi / 4 : .pi / 4
         entity.orientation = simd_quatf(angle: angle, axis: SIMD3<Float>(0, 1, 0))
     }
+}
+@Observable
+final class SceneRef {
+    weak var root: Entity?
 }
 
 #Preview(immersionStyle: .mixed) {
