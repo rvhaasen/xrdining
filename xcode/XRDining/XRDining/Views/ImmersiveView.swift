@@ -28,6 +28,10 @@ struct ImmersiveView: View {
     let audio = AudioManager()
     
     let menuTags = ["a", "b", "c"]
+
+    //@State private var labels: [String] = []         // what we want to add
+    @State private var inserted = Set<String>()      // which ones are in the scene
+
     
     var body: some View {
         @Bindable var appModel = appModel
@@ -38,22 +42,16 @@ struct ImmersiveView: View {
         
         RealityView { content, attachments  in
                         
-            // Add menu objects
-//            for tag in menuTags {
+//            // Add menu objects
+//            for tag in appModel.items.map(\.title) {
 //                attachments.entity(for: tag).map(content.add)
 //            }
-            for tag in appModel.items.map(\.title) {
-                attachments.entity(for: tag).map(content.add)
-            }
-
-            // Set the rotation such that the menu faces the user (caller/callee)
-//            for tag in menuTags {
+//
+//            // Set the rotation such that the menu faces the user (caller/callee)
+//            for tag in appModel.items.map(\.title) {
 //                attachments.entity(for: tag).map(updatePodiumPose(_:))
 //            }
-            for tag in appModel.items.map(\.title) {
-                attachments.entity(for: tag).map(updatePodiumPose(_:))
-            }
-            content.add(appModel.setupContentEntity())
+//            content.add(appModel.setupContentEntity())
             
             // Create placeholder material, it will be replaced by VideoMaterial when video is loaded
             let mat  = SimpleMaterial(color: .black, isMetallic: false)
@@ -73,8 +71,37 @@ struct ImmersiveView: View {
             
             content.add(appModel.mySphere)
             
+            let root = Entity()
+            root.name = "root"
+            content.add(root)
+            scene.root = root
+            
         }
         update: { content, attachments in
+            
+            guard let root = scene.root else { return }
+            
+            // Insert any labels that aren't in the scene yet
+            for id in appModel.activeAttachments where !inserted.contains(id) {
+                if let e = attachments.entity(for: "\(id)") {
+                    // Set the name of the entity so it can be found when it needs to be removed
+                    e.name = id
+                    root.addChild(e)
+                    appModel.insertedAttachments.insert(id)
+                    attachments.entity(for: id).map(updatePodiumPose(_:))
+                }
+            }
+
+            if (appModel.activeAttachments.isEmpty) {
+                print("activeAttachments is empty")
+            }
+            // Remove entities for labels that were deleted
+            for gone in appModel.insertedAttachments.subtracting(appModel.activeAttachments) {
+                if let child = root.children.first(where: { $0.name == "\(gone)" }) {
+                    child.removeFromParent()
+                }
+                appModel.insertedAttachments.remove(gone)
+            }
             
             logger.info("SPHERE rotate in to \(appModel.sphereAngle)")
             if let foundEntity = content.entities.first(where: { $0.name == "sphere" }) {
@@ -131,6 +158,15 @@ struct ImmersiveView: View {
                     
                     if let url = item.videoURL {
                         startVideo(url: url, volume: item.volume)
+                    }
+                    // Select course as activeAttachements if defined in stage
+                    if item.pdfURL != nil {
+                        print("Enabling attachement \(item.title)")
+                        appModel.activeAttachments = [item.title]
+                    }
+                    else {
+                        print("No attachment for this stage, clearing activeAttachments")
+                        appModel.activeAttachments = []
                     }
                 } else {
                     // Last stage has been processed, stop all, close views which puts the

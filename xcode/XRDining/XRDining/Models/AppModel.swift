@@ -21,6 +21,10 @@ class AppModel {
     // Definition of scenes
     var items: [StageItem] = []
     
+    // List of attachments (used for course-description)
+    var activeAttachments: [String] = []
+    var insertedAttachments: Set<String> = Set<String>()
+
     // Set default role to called,
     // For the initiator of it will be set to 'called'
     // This will define the seating positions
