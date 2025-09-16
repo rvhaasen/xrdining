@@ -51,7 +51,7 @@ struct ImmersiveView: View {
 //            for tag in appModel.items.map(\.title) {
 //                attachments.entity(for: tag).map(updatePodiumPose(_:))
 //            }
-//            content.add(appModel.setupContentEntity())
+            content.add(appModel.setupContentEntity())
             
             // Create placeholder material, it will be replaced by VideoMaterial when video is loaded
             let mat  = SimpleMaterial(color: .black, isMetallic: false)
@@ -92,9 +92,6 @@ struct ImmersiveView: View {
                 }
             }
 
-            if (appModel.activeAttachments.isEmpty) {
-                print("activeAttachments is empty")
-            }
             // Remove entities for labels that were deleted
             for gone in appModel.insertedAttachments.subtracting(appModel.activeAttachments) {
                 if let child = root.children.first(where: { $0.name == "\(gone)" }) {
