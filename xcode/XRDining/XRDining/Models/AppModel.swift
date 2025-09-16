@@ -18,6 +18,8 @@ import OSLog
 @Observable @MainActor
 class AppModel {
     
+    let modelsFromBundle = ["gebakske"]
+    
     // Definition of scenes
     var items: [StageItem] = []
     

@@ -40,6 +40,8 @@ struct ImmersiveView: View {
         //var currentItem = it.next() as StageItem?
         var nextStageAt: Int = 0
         
+        var closing = false
+        
         RealityView { content, attachments  in
                         
 //            // Add menu objects
@@ -80,6 +82,7 @@ struct ImmersiveView: View {
         update: { content, attachments in
             
             guard let root = scene.root else { return }
+            guard closing == false else { return }
             
             // Insert any labels that aren't in the scene yet
             for id in appModel.activeAttachments where !inserted.contains(id) {
@@ -112,7 +115,7 @@ struct ImmersiveView: View {
             }
         }
         attachments: {
-            ForEach(appModel.items.filter { $0.pdfURL != nil} ) { item in
+            ForEach(appModel.items.filter { $0.pdfURL != nil && !$0.modelFromBundle.isEmpty} ) { item in
                 Attachment(id: item.title) {
                     CourseView(url: item.pdfURL!, modelName: "gebakske")
                     //                    .glassBackgroundEffect(      // ✅ gives you the translucent visionOS glass
@@ -168,6 +171,7 @@ struct ImmersiveView: View {
                 } else {
                     // Last stage has been processed, stop all, close views which puts the
                     // application to background
+                    closing = true
                     stopVideo()
                     logInfo("Done, exiting immersive space")
                     audio.stop()

@@ -27,6 +27,7 @@ struct StageItem: Identifiable, Equatable {
     var volume: Float = 1.0
     var pdfURL: URL? = nil
     var usdzURL: URL? = nil
+    var modelFromBundle: String = ""
 }
 
 // MARK: - Main List
@@ -93,6 +94,7 @@ struct StageView: View {
 
 // MARK: - New Item Sheet (create)
 struct NewItemSheet: View {
+    @Environment(AppModel.self) var appModel
     @Environment(\.dismiss) private var dismiss
     @State private var title: String = ""
     @State private var videoURL : URL?
@@ -103,6 +105,7 @@ struct NewItemSheet: View {
     @State private var rotation: Int = 0
     @State private var volume: Float = 1.0
     @State private var pdfURL: URL?
+    @State private var modelFromBundle: String = ""
     @State private var usdzURL: URL?
     @State private var showFileImporter = false
     @State private var fileImportError: Error? = nil
@@ -192,17 +195,23 @@ struct NewItemSheet: View {
                             Text(url.lastPathComponent).font(.footnote).foregroundStyle(.secondary)
                         }
                     }
-                    HStack {
-                        Button {
-                            importType = .usdz
-                            showFileImporter = true
-                        } label: {
-                            Label("Select meal 3D model", systemImage: "cube")
-                        }
-                        if let url = usdzURL {
-                            Text(url.lastPathComponent).font(.footnote).foregroundStyle(.secondary)
+                    Picker("Select model from bundle", selection: $modelFromBundle) {
+                        ForEach(appModel.modelsFromBundle, id: \.self) { s in
+                            Text(s).tag(s)          // tag must match selection’s type
                         }
                     }
+                    .pickerStyle(.menu)             // or .segmented, .wheel, .navigationLink
+//                    HStack {
+//                        Button {
+//                            importType = .usdz
+//                            showFileImporter = true
+//                        } label: {
+//                            Label("Select meal 3D model", systemImage: "cube")
+//                        }
+//                        if let url = usdzURL {
+//                            Text(url.lastPathComponent).font(.footnote).foregroundStyle(.secondary)
+//                        }
+//                    }
 //                    Button {
 //                        showBundleAudioPicker = true
 //                    } label: {
@@ -321,6 +330,7 @@ struct NewItemSheet: View {
 
 // MARK: - Editor (edit existing)
 struct StageEditor: View {
+    @Environment(AppModel.self) var appModel
     @Binding var item: StageItem
     @State private var fileImportError: Error?
     //@State private var duration: Int
@@ -414,17 +424,22 @@ struct StageEditor: View {
                         Text(url.lastPathComponent).font(.footnote).foregroundStyle(.secondary)
                     }
                 }
-                HStack {
-                    Button {
-                        importType = .usdz
-                        showFileImporter = true
-                    } label: {
-                        Label("Select meal 3D model", systemImage: "cube")
-                    }
-                    if let url = item.usdzURL {
-                        Text(url.lastPathComponent).font(.footnote).foregroundStyle(.secondary)
+                Picker("Select model from bundle", selection: $item.modelFromBundle) {
+                    ForEach(appModel.modelsFromBundle, id: \.self) { s in
+                        Text(s).tag(s)          // tag must match selection’s type
                     }
                 }
+//                HStack {
+//                    Button {
+//                        importType = .usdz
+//                        showFileImporter = true
+//                    } label: {
+//                        Label("Select meal 3D model", systemImage: "cube")
+//                    }
+//                    if let url = item.usdzURL {
+//                        Text(url.lastPathComponent).font(.footnote).foregroundStyle(.secondary)
+//                    }
+//                }
 //                Button {
 //                    showBundleAudioPicker = true
 //                } label: {
