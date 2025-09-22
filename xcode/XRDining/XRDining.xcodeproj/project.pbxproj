@@ -15,6 +15,7 @@
 		1D813C362E560DB5000EA0B5 /* xrdining-desert.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 1D813C352E560DB5000EA0B5 /* xrdining-desert.m4a */; };
 		1D813C382E560DCF000EA0B5 /* xrdining-main-meal.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 1D813C372E560DCF000EA0B5 /* xrdining-main-meal.m4a */; };
 		1DA2C56F2E5907E100595A05 /* nordsea_with_gulls.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 1DA2C56E2E5907E100595A05 /* nordsea_with_gulls.mp3 */; };
+		1DA372F92E817CEC00129A22 /* xrdining-hd.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 1DA372F82E817CAA00129A22 /* xrdining-hd.mp4 */; };
 		1DB198732E4253340025BF8A /* Otto lenghi 1.referenceobject in Sources */ = {isa = PBXBuildFile; fileRef = 1DB198722E4253340025BF8A /* Otto lenghi 1.referenceobject */; };
 		1DFEB0BB2E02B93E0081E5E7 /* RealityKitContent in Frameworks */ = {isa = PBXBuildFile; productRef = 1DFEB0BA2E02B93E0081E5E7 /* RealityKitContent */; };
 /* End PBXBuildFile section */
@@ -28,6 +29,7 @@
 		1D813C352E560DB5000EA0B5 /* xrdining-desert.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; name = "xrdining-desert.m4a"; path = "/Users/rick/xrdining/assets/audio/xrdining-desert.m4a"; sourceTree = "<absolute>"; };
 		1D813C372E560DCF000EA0B5 /* xrdining-main-meal.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; name = "xrdining-main-meal.m4a"; path = "/Users/rick/xrdining/assets/audio/xrdining-main-meal.m4a"; sourceTree = "<absolute>"; };
 		1DA2C56E2E5907E100595A05 /* nordsea_with_gulls.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = nordsea_with_gulls.mp3; path = /Users/rick/xrdining/assets/audio/nordsea_with_gulls.mp3; sourceTree = "<absolute>"; };
+		1DA372F82E817CAA00129A22 /* xrdining-hd.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; name = "xrdining-hd.mp4"; path = "/Users/rick/xrdining/assets/videos/xrdining-hd.mp4"; sourceTree = "<absolute>"; };
 		1DB198722E4253340025BF8A /* Otto lenghi 1.referenceobject */ = {isa = PBXFileReference; lastKnownFileType = file.referenceobject; name = "Otto lenghi 1.referenceobject"; path = "/Users/rick/VisionOS/ExploringObjectTrackingWithARKit/Reference Objects/Otto lenghi 1.referenceobject"; sourceTree = "<absolute>"; };
 		1DFEB0B52E02B93E0081E5E7 /* XRDining.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = XRDining.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		1DFEB0B92E02B93E0081E5E7 /* RealityKitContent */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = RealityKitContent; sourceTree = "<group>"; };
@@ -91,6 +93,7 @@
 		1D4FEF742E1923FB00D27B9E /* videos */ = {
 			isa = PBXGroup;
 			children = (
+				1DA372F82E817CAA00129A22 /* xrdining-hd.mp4 */,
 			);
 			path = videos;
 			sourceTree = "<group>";
@@ -216,6 +219,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				1DA372F92E817CEC00129A22 /* xrdining-hd.mp4 in Resources */,
 				1D4FEF772E1926AA00D27B9E /* picknick_tafel.jpg in Resources */,
 				1D813C362E560DB5000EA0B5 /* xrdining-desert.m4a in Resources */,
 				1D813C382E560DCF000EA0B5 /* xrdining-main-meal.m4a in Resources */,

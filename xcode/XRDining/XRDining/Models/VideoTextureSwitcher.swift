@@ -45,7 +45,7 @@ func swapVideoFromUrl(on entity: ModelEntity, materialIndex: Int, to url: URL, v
     let oldMaterial = model.materials[materialIndex] as? VideoMaterial
     let oldPlayer = oldMaterial?.avPlayer
     
-    let player = await makePlayer(url: url, loop: true)
+    let player = await makePlayer(url: url, loop: false)
 
     // Rebuild the material with the new player
     var mats = model.materials

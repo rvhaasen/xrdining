@@ -53,6 +53,11 @@ struct ImmersiveView: View {
 //            for tag in appModel.items.map(\.title) {
 //                attachments.entity(for: tag).map(updatePodiumPose(_:))
 //            }
+//            if appModel.isSingleUser {
+//                Task {
+//                    dismissWindow(id: "MainWindow")
+//                }
+//            }
             content.add(appModel.setupContentEntity())
             
             // Create placeholder material, it will be replaced by VideoMaterial when video is loaded
@@ -68,7 +73,14 @@ struct ImmersiveView: View {
                 //entity.position =  SIMD3<Float>(0, -0.5, 35)
                 // +10 is specific for visvijver scene, in order to put the users
                 // not "in the water" for others this is not needed
-                appModel.mySphere.position = SIMD3<Float>(0, -appModel.seatHeightOffset, appModel.screen2tableDistance + 10.0)
+                let rotation2 = simd_quatf(angle: -.pi/2.0, axis: [0, 1, 0])
+                appModel.mySphere.transform.rotation = rotation2
+                appModel.mySphere.position = SIMD3<Float>(0, -appModel.seatHeightOffset, appModel.screen2tableDistance)
+
+                // appModel.mySphere.position = SIMD3<Float>(0, -appModel.seatHeightOffset, appModel.screen2tableDistance + 10.0)
+
+                //                let rotation2 = simd_quatf(angle: Float(appModel.sphereAngle) * 2.0 * .pi/360.0, axis: [0, 1, 0])
+                //                foundEntity.transform.rotation = rotation2
             }
             
             content.add(appModel.mySphere)
@@ -107,11 +119,11 @@ struct ImmersiveView: View {
             if let foundEntity = content.entities.first(where: { $0.name == "sphere" }) {
                 // Use foundEntity
                 logger.info("SPHERE object found")
-                let rotation2 = simd_quatf(angle: Float(appModel.sphereAngle) * 2.0 * .pi/360.0, axis: [0, 1, 0])
-                //foundEntity.transform.rotation = rotation2
-                foundEntity.transform.rotation = rotation2
+//                let rotation2 = simd_quatf(angle: Float(appModel.sphereAngle) * 2.0 * .pi/360.0, axis: [0, 1, 0])
+//                foundEntity.transform.rotation = rotation2
                 //let rotation2 = simd_quatf(angle: angle * 2.0 * .pi/360.0, axis: [0, 1, 0])
-                foundEntity.transform.translation = [0,0, Float(appModel.positionOffset)]
+//                foundEntity.transform.translation = [0,0, Float(appModel.positionOffset)]
+                foundEntity.transform.translation = [0,0, Float(appModel.screen2tableDistance)]
             }
         }
         attachments: {

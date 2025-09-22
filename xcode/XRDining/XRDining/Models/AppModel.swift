@@ -110,7 +110,6 @@ class AppModel {
         }
     }
     
-    var isSingleUser: Bool = true
     var doObjectDetection: Bool = false
     
     var immersiveSpaceState : ImmersiveSpaceState = .closed
@@ -120,8 +119,13 @@ class AppModel {
     var videoModel: VideoModel?
     
     // TODO: refactor in order to make it content dependent,
-    // e.g. current value of 0.5 was for the "philips visvijver" video
+    // If is isSingleUser == false, set screen2tableDistance to 0, else to 20
+//    var isSingleUser: Bool = false
+//    var screen2tableDistance: Float = 50.0
+
+    var isSingleUser: Bool = true
     var screen2tableDistance: Float = 0.0
+
     let seatHeightOffset: Float = 0.5
         
     // When a person denies authorization or a data provider state changes to an error condition,
@@ -281,6 +285,7 @@ class AppModel {
 
     // Constructor
     init() {
+        //screen2tableDistance = isSingleUser ? 0.0 : 20.0
         selectedWorld = VideoInfo.World.visvijver
         videoModel = VideoModel()
         videos[VideoInfo.World.visvijver] = VideoInfo(rotationDegrees: -90.0)
@@ -290,7 +295,7 @@ class AppModel {
         if !isSimulator {
             runBackgroundTasks()
         }
-        screen2tableDistance = isSingleUser ? 0.0 : 20.0
+
     }
     let isSimulator: Bool = {
         return ProcessInfo.processInfo.environment["SIMULATOR_DEVICE_NAME"] != nil

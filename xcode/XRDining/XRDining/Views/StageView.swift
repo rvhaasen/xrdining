@@ -111,6 +111,7 @@ struct NewItemSheet: View {
     @State private var fileImportError: Error? = nil
     @State private var showBundleVideoPicker = false
     @State private var showBundleAudioPicker = false
+    @State private var showBundlePdfPicker = false
 
     @State private var pickedURL: URL?
     @State private var hasSecurityScope = false
@@ -168,11 +169,11 @@ struct NewItemSheet: View {
                             .multilineTextAlignment(.trailing)
                             .frame(width: 80)
                     }
-//                    Button {
-//                        showBundleVideoPicker = true
-//                    } label: {
-//                        Label("Select video from Bundle...", systemImage: "shippingbox")
-//                    }
+                    Button {
+                        showBundleVideoPicker = true
+                    } label: {
+                        Label("Select video from Bundle...", systemImage: "shippingbox")
+                    }
                     HStack {
                         Button {
                             importType = .audio
@@ -194,6 +195,11 @@ struct NewItemSheet: View {
                         if let url = pdfURL {
                             Text(url.lastPathComponent).font(.footnote).foregroundStyle(.secondary)
                         }
+                    }
+                    Button {
+                        showBundlePdfPicker = true
+                    } label: {
+                        Label("Select pdf from Bundle...", systemImage: "shippingbox")
                     }
                     Picker("Select model from bundle", selection: $modelFromBundle) {
                         ForEach(appModel.modelsFromBundle, id: \.self) { s in
@@ -235,7 +241,8 @@ struct NewItemSheet: View {
                                         isEnabled: isEnabled,
                                         volume: volume,
                                         pdfURL: pdfURL,
-                                        usdzURL: usdzURL)
+                                        usdzURL: usdzURL,
+                                        modelFromBundle: modelFromBundle)
                         onSave(item)
                         dismiss()
                     }
@@ -297,6 +304,18 @@ struct NewItemSheet: View {
                         #endif
                     }
                     showBundleAudioPicker = false
+                }
+            }
+            .sheet(isPresented: $showBundlePdfPicker) {
+                BundlePdfPicker { selected in
+                    if let selected = selected {
+                        #if canImport(UIKit)
+                        if let url = Bundle.main.url(forResource: selected, withExtension: "pdf") {
+                            pdfURL = url
+                        }
+                        #endif
+                    }
+                    showBundlePdfPicker = false
                 }
             }
         }
@@ -397,11 +416,11 @@ struct StageEditor: View {
                         .multilineTextAlignment(.trailing)
                         .frame(width: 80)
                 }
-//                Button {
-//                    showBundleVideoPicker = true
-//                } label: {
-//                    Label("Select video from Bundle...", systemImage: "shippingbox")
-//                }
+                Button {
+                    showBundleVideoPicker = true
+                } label: {
+                    Label("Select video from Bundle...", systemImage: "shippingbox")
+                }
                 HStack {
                     Button {
                         importType = .audio
@@ -568,6 +587,23 @@ struct BundleVideoPicker: View {
     var body: some View {
         NavigationStack {
             List(videos, id: \.self) { name in
+                Button(name) { onPick(name); dismiss() }
+            }
+            Button("Cancel") { onPick(nil); dismiss() }
+                .foregroundStyle(.red)
+        }
+    }
+}
+struct BundlePdfPicker: View {
+    let onPick: (String?) -> Void
+    @Environment(\.dismiss) private var dismiss
+    private var pdfs: [String] {
+        (Bundle.main.paths(forResourcesOfType: "pdf", inDirectory: nil) as [String])
+            .map { URL(fileURLWithPath: $0).deletingPathExtension().lastPathComponent }
+    }
+    var body: some View {
+        NavigationStack {
+            List(pdfs, id: \.self) { name in
                 Button(name) { onPick(name); dismiss() }
             }
             Button("Cancel") { onPick(nil); dismiss() }

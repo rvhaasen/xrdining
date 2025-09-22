@@ -41,6 +41,14 @@ struct Configuration: View {
                 }
             }
             VStack(spacing: 20) {
+//                Toggle(isOn: $appModel.isSingleUser) {
+//                let big: Float = 20.0
+//                let small: Float = 0.0
+//                    Toggle(isOn: Binding(
+//                        get: { appModel.screen2tableDistance == small },
+//                        set: { isOn in appModel.screen2tableDistance = isOn ? small : big }
+//                    ))
+                
                 Toggle(isOn: $appModel.isSingleUser) {
                     Label("single-user", systemImage: "person")
                 }
