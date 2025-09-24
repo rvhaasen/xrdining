@@ -59,42 +59,39 @@ struct SharePlayButton<ActivityType: GroupActivity & Transferable & Sendable>: V
             // screen. From a participant view, the other participant is either to the
             // left or the right (order is not determined, this probably can be done
             // using custom template and role assignment).
-    
-            
-            if !appModel.isSingleUser {
-                Button(text, systemImage: "shareplay") {
-                    if groupStateObserver.isEligibleForGroupSession {
-                        // The application screen will appear on the
-                        // left side of the 'caller' and on the right
-                        // side of the 'called'. It is important to know
-                        // the position in order to rotate the menu-screen
-                        // correctly toward each user
-                        appModel.spatialTemplateRole = .caller
-                        Task.detached {
-                            do {
-                                _ = try await activity.activate()
-                                //await openImmersive()
-                            } catch {
-                                print("Error activating activity: \(error)")
-                                
-                                Task { @MainActor in
-                                    isActivationErrorViewPresented = true
-                                }
+                
+            Button(text, systemImage: "shareplay") {
+                if groupStateObserver.isEligibleForGroupSession {
+                    // The application screen will appear on the
+                    // left side of the 'caller' and on the right
+                    // side of the 'called'. It is important to know
+                    // the position in order to rotate the menu-screen
+                    // correctly toward each user
+                    appModel.spatialTemplateRole = DiningTemplate.Role.caller
+                    Task.detached {
+                        do {
+                            _ = try await activity.activate()
+                            //await openImmersive()
+                        } catch {
+                            print("Error activating activity: \(error)")
+                            
+                            Task { @MainActor in
+                                isActivationErrorViewPresented = true
                             }
                         }
-                    } else {
-                        isActivitySharingViewPresented = true
                     }
+                } else {
+                    isActivitySharingViewPresented = true
                 }
-                .tint(.green)
-                .sheet(isPresented: $isActivitySharingViewPresented) {
-                    activitySharingView
-                }
-                .alert("Unable to start game", isPresented: $isActivationErrorViewPresented) {
-                    Button("Ok", role: .cancel) { }
-                } message: {
-                    Text("Please try again later.")
-                }
+            }
+            .tint(.green)
+            .sheet(isPresented: $isActivitySharingViewPresented) {
+                activitySharingView
+            }
+            .alert("Unable to start game", isPresented: $isActivationErrorViewPresented) {
+                Button("Ok", role: .cancel) { }
+            } message: {
+                Text("Please try again later.")
             }
         }
     }

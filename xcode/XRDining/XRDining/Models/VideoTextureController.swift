@@ -41,7 +41,7 @@ final class VideoTextureController {
         do {
             let item = try await prepareItem(videoName: videoName)
             player.replaceCurrentItem(with: item)
-            let mat = try VideoMaterial(avPlayer: player)
+            let mat = VideoMaterial(avPlayer: player)
             currentMaterial = mat
             apply(material: mat)
             player.play()
@@ -65,13 +65,14 @@ final class VideoTextureController {
         player.pause()
 
         // 3a) Option A: swap the entire material (most robust)
-        do {
+//        do {
             // Use a *new* AVPlayer for the new material if you want truly independent pipelines
             // to avoid any internal churn from replaceCurrentItem:
             let freshPlayer = AVPlayer()
             freshPlayer.replaceCurrentItem(with: nextItem)
 
-            let newMat = try VideoMaterial(avPlayer: freshPlayer)
+//            let newMat = try VideoMaterial(avPlayer: freshPlayer)
+            let newMat = VideoMaterial(avPlayer: freshPlayer)
 
             // Apply atomically on the main actor
             apply(material: newMat)
@@ -82,12 +83,13 @@ final class VideoTextureController {
 
             // 4) Start playback
             freshPlayer.play()
-        } catch {
-            print("Failed to create/apply new VideoMaterial: \(error)")
-            // Fallback 3b) Option B: reuse the same player; this works too, but swap after pause
-            player.replaceCurrentItem(with: nextItem)
-            player.play()
-        }
+//        }
+//        catch {
+//            print("Failed to create/apply new VideoMaterial: \(error)")
+//            // Fallback 3b) Option B: reuse the same player; this works too, but swap after pause
+//            player.replaceCurrentItem(with: nextItem)
+//            player.play()
+//        }
 
         // 5) Optionally, delay releasing old objects by one runloop to avoid dealloc during render
         // (Not strictly necessary here because we kept strong refs, but useful if you keep

@@ -12,6 +12,7 @@ import RealityKitContent
 import AVFoundation
 import OSLog
 internal import Combine
+import GroupActivities
 
 struct ImmersiveView: View {
     @Environment(\.dismissImmersiveSpace) private var dismissImmersiveSpace
@@ -115,10 +116,10 @@ struct ImmersiveView: View {
                 appModel.insertedAttachments.remove(gone)
             }
             
-            logger.info("SPHERE rotate in to \(appModel.sphereAngle)")
+//            logger.info("SPHERE rotate in to \(appModel.sphereAngle)")
             if let foundEntity = content.entities.first(where: { $0.name == "sphere" }) {
                 // Use foundEntity
-                logger.info("SPHERE object found")
+//                logger.info("SPHERE object found")
 //                let rotation2 = simd_quatf(angle: Float(appModel.sphereAngle) * 2.0 * .pi/360.0, axis: [0, 1, 0])
 //                foundEntity.transform.rotation = rotation2
                 //let rotation2 = simd_quatf(angle: angle * 2.0 * .pi/360.0, axis: [0, 1, 0])
@@ -190,7 +191,13 @@ struct ImmersiveView: View {
                     appModel.immersiveSpaceState = .inTransition
                     Task {
                         await dismissImmersiveSpace()
+                        nextStageAt = 0
                     }
+                    if let session = appModel.currentGroupSession {
+                        session.end()
+                        print("Ended shareplay session")
+                    }
+                    appModel.currentGroupSession = nil
                     dismissWindow(id: "MainWindow")
                 }
             }
@@ -291,8 +298,19 @@ struct ImmersiveView: View {
     // orient the menu-view
     //
     func updatePodiumPose(_ entity: Entity) {
-        entity.position = .init(Vector3D(x: -0.5, y: 1.0, z: appModel.screen2tableDistance-0.5))
-        let angle : Float = appModel.spatialTemplateRole == .caller ? -.pi / 4 : .pi / 4
+        
+        var position: SIMD3<Float>
+        var angle: Float
+        
+        if appModel.isSingleUser {
+            // TODO refactor to table-width/2 or something like that
+            position = .init(Vector3D(x: -0.5 , y: 1.0, z: appModel.screen2tableDistance-0.5))
+            angle = .pi / 4
+        } else {
+            position = .init(Vector3D(x: 0, y: 1.0, z: appModel.screen2tableDistance-0.5))
+            angle = appModel.spatialTemplateRole == DiningTemplate.Role.caller ? -.pi / 4 : .pi / 4
+        }
+        entity.position = position
         entity.orientation = simd_quatf(angle: angle, axis: SIMD3<Float>(0, 1, 0))
     }
 }

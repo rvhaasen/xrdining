@@ -17,7 +17,7 @@ struct MainView: View {
     @Environment(\.dismissImmersiveSpace) private var dismissImmersiveSpace
     @Environment(\.openImmersiveSpace) private var openImmersiveSpace
     @Environment(\.dismissWindow) private var dismissWindow
-
+    
     @ObservedObject
     private var groupStateObserver = GroupStateObserver()
     
@@ -33,9 +33,10 @@ struct MainView: View {
         let openImmersive: () -> Void = {
             Task { @MainActor in
                 //openWindow(id: "koekjes")
-                
+                print("In oppenImmersive()..")
                 switch appModel.immersiveSpaceState {
                     case .open:
+                        print("case .open")
                         appModel.immersiveSpaceState = .inTransition
                         appModel.videoModel?.stop()
                         await dismissImmersiveSpace()
@@ -44,13 +45,15 @@ struct MainView: View {
                         // Only set .closed in ImmersiveView.onDisappear().
 
                     case .closed:
+                        print("case .closed")
                         appModel.immersiveSpaceState = .inTransition
                         switch await openImmersiveSpace(id: appModel.immersiveSpaceID) {
                             case .opened:
                                 // Don't set immersiveSpaceState to .open because there
                                 // may be multiple paths to ImmersiveView.onAppear().
                                 // Only set .open in ImmersiveView.onAppear().
-                                break
+
+                            break
 
                             case .userCancelled, .error:
                                 // On error, we need to mark the immersive space
@@ -62,6 +65,7 @@ struct MainView: View {
                         }
 
                     case .inTransition:
+                        print("case .inTransition")
                         // This case should not ever happen because button is disabled for this case.
                         break
                 }
@@ -87,7 +91,9 @@ struct MainView: View {
                     } label: {
                         Text("VideoPicker")
                     }.padding(.bottom, 20)
-                    ToggleImmersiveSpaceButton(openImmersive: openImmersive)
+                    if appModel.isSingleUser {
+                        ToggleImmersiveSpaceButton(openImmersive: openImmersive)
+                    }
                 }
                 .font(.title2)
                 .padding(.bottom, 20)
@@ -95,9 +101,11 @@ struct MainView: View {
                 Divider()
                 
             }
-            SharePlayButton("Share XRDining activity", activity: PersonasActivity(), openImmersive: openImmersive)
-                .padding(.vertical, 50)
-                .font(.title2)
+            if !appModel.isSingleUser {
+                SharePlayButton("Share XRDining activity", activity: PersonasActivity(), openImmersive: openImmersive)
+                    .padding(.vertical, 50)
+                    .font(.title2)
+            }
         }
         .task(observeGroupSessions)
         .onChange(of: scenePhase, initial: true) {

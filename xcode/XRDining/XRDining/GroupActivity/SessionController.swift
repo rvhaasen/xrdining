@@ -58,6 +58,8 @@ final class SessionController {
         guard let groupSystemCoordinator = await groupSession.systemCoordinator else {
             return nil
         }
+        appModel.currentGroupSession = groupSession
+        
         spatialTemplateRole = appModel.spatialTemplateRole
         screenDistance = Double(appModel.screen2tableDistance)
         session = groupSession

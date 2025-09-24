@@ -41,15 +41,18 @@ struct Configuration: View {
                 }
             }
             VStack(spacing: 20) {
-//                Toggle(isOn: $appModel.isSingleUser) {
-//                let big: Float = 20.0
-//                let small: Float = 0.0
-//                    Toggle(isOn: Binding(
-//                        get: { appModel.screen2tableDistance == small },
-//                        set: { isOn in appModel.screen2tableDistance = isOn ? small : big }
-//                    ))
-                
-                Toggle(isOn: $appModel.isSingleUser) {
+                Toggle(isOn: Binding(
+                    get: { appModel.isSingleUser },
+                    set: { isOn in
+                        if isOn {
+                            appModel.screen2tableDistance = appModel.singleUserScreen2tableDistance
+                            appModel.isSingleUser = true
+                        } else {
+                            appModel.screen2tableDistance = appModel.dualUserscreen2tableDistance
+                            appModel.isSingleUser = false
+                        }
+                    }
+                )) {
                     Label("single-user", systemImage: "person")
                 }
                 Toggle(isOn: $appModel.doObjectDetection) {

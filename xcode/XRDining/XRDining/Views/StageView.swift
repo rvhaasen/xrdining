@@ -199,7 +199,7 @@ struct NewItemSheet: View {
                     Button {
                         showBundlePdfPicker = true
                     } label: {
-                        Label("Select pdf from Bundle...", systemImage: "shippingbox")
+                        Label("Select meal from Bundle...", systemImage: "shippingbox")
                     }
                     Picker("Select model from bundle", selection: $modelFromBundle) {
                         ForEach(appModel.modelsFromBundle, id: \.self) { s in
@@ -355,6 +355,7 @@ struct StageEditor: View {
     //@State private var duration: Int
     @State private var showBundleVideoPicker = false
     @State private var showBundleAudioPicker = false
+    @State private var showBundlePdfPicker = false
     @State private var showFileImporter = false
     
     @State private var pickedURL: URL?
@@ -443,6 +444,11 @@ struct StageEditor: View {
                         Text(url.lastPathComponent).font(.footnote).foregroundStyle(.secondary)
                     }
                 }
+                Button {
+                    showBundlePdfPicker = true
+                } label: {
+                    Label("Select meal from Bundle...", systemImage: "shippingbox")
+                }
                 Picker("Select model from bundle", selection: $item.modelFromBundle) {
                     ForEach(appModel.modelsFromBundle, id: \.self) { s in
                         Text(s).tag(s)          // tag must match selection’s type
@@ -500,24 +506,6 @@ struct StageEditor: View {
                 fileImportError = error
             }
         }
-//        .fileImporter(isPresented: Binding(get: { importType != nil },
-//                                          set: { if !$0 { importType = nil } }),
-//                      allowedContentTypes: importType == .video ? [.video] : [.audio],
-//                      allowsMultipleSelection: false) { result in
-//            switch result {
-//            case .success(let urls):
-//                if let selected = urls.first {
-//                    if importType == .video {
-//                        item.videoURL = selected
-//                    } else if importType == .audio {
-//                        item.audioURL = selected
-//                    }
-//                }
-//            case .failure(let error):
-//                fileImportError = error
-//            }
-//            importType = nil
-//        }
         .sheet(isPresented: $showBundleVideoPicker) {
             BundleVideoPicker { selected in
                 if let selected = selected {
@@ -542,6 +530,19 @@ struct StageEditor: View {
                 showBundleAudioPicker = false
             }
         }
+        .sheet(isPresented: $showBundlePdfPicker) {
+            BundlePdfPicker { selected in
+                if let selected = selected {
+                    #if canImport(UIKit)
+                    if let url = Bundle.main.url(forResource: selected, withExtension: "pdf") {
+                        item.pdfURL = url
+                    }
+                    #endif
+                }
+                showBundlePdfPicker = false
+            }
+        }
+
     }
     private func handlePickedURL(_ url: URL) -> URL {
         // Clean up previous selection

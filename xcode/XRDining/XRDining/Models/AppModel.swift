@@ -12,11 +12,14 @@ import ARKit
 import RealityKit
 internal import os
 import OSLog
+import GroupActivities
 
 /// Maintains app-wide state
 
 @Observable @MainActor
 class AppModel {
+    
+    var currentGroupSession: GroupSession<PersonasActivity>? = nil
     
     let modelsFromBundle = ["gebakske"]
     
@@ -120,11 +123,15 @@ class AppModel {
     
     // TODO: refactor in order to make it content dependent,
     // If is isSingleUser == false, set screen2tableDistance to 0, else to 20
-//    var isSingleUser: Bool = false
-//    var screen2tableDistance: Float = 50.0
+    let singleUserScreen2tableDistance : Float = 0.0
+    let dualUserscreen2tableDistance : Float = 50.0
+    
+    var isSingleUser: Bool = false
+    var screen2tableDistance: Float
+    
 
-    var isSingleUser: Bool = true
-    var screen2tableDistance: Float = 0.0
+//    var isSingleUser: Bool = true
+//    var screen2tableDistance: Float = 0.0
 
     let seatHeightOffset: Float = 0.5
         
@@ -285,7 +292,7 @@ class AppModel {
 
     // Constructor
     init() {
-        //screen2tableDistance = isSingleUser ? 0.0 : 20.0
+        screen2tableDistance = singleUserScreen2tableDistance
         selectedWorld = VideoInfo.World.visvijver
         videoModel = VideoModel()
         videos[VideoInfo.World.visvijver] = VideoInfo(rotationDegrees: -90.0)
