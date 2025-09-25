@@ -134,7 +134,8 @@ struct ImmersiveView: View {
                     //                    .glassBackgroundEffect(      // ✅ gives you the translucent visionOS glass
                     //                        in: RoundedRectangle(cornerRadius: 24, style: .continuous)
                     //                    )
-                        .frame(width: 300, height: 600)
+                        .frame(width: 800, height: 1400)
+//                        .frame(width: 450, height: 700)
                 }
             }
         }

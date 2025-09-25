@@ -19,17 +19,27 @@ struct CourseView: View {
     
     var body: some View {
         
-        VStackLayout(spacing: 30).depthAlignment(.back)  {
+//        VStackLayout(spacing: 30).depthAlignment(.back)  {
+        ZStack() {
             PDFReaderView(url: url)
-                //.frame(width: 300, height: 350)
-            //Spacer()
-            Model3D(named: modelName, bundle: realityKitContentBundle) { model in
-                if let model = model.model {
-                    model
+            //.frame(width: 300, height: 350)
+            Spacer()
+            VStack  {
+                Spacer()
+                Spacer()
+                Model3D(named: modelName, bundle: realityKitContentBundle) { model in
+                    if let model = model.model {
+                        model
                         //.resizable()
-                        //.scaledToFit3D()
+                        .scaledToFit3D()
+                    }
                 }
+                Spacer()
             }
+            Spacer()
+            Spacer()
+        }
+        //.padding(.top, 00)
             //.frame(width: 300, height: 350)
 
             // Push the carousel to the front of the rectangular volume.
@@ -53,12 +63,11 @@ struct CourseView: View {
 //            VStackLayout(spacing: 20).depthAlignment(.front) {
 //                Spacer()
 //            }
-        }
     }
 }
 
 #Preview {
     let pdfUrl = Bundle.main.url(forResource: "factuur", withExtension: "pdf")!
     CourseView(url: pdfUrl, modelName: "gebakske")
-        .frame(width: 300, height: 600)
+        .frame(width: 400, height: 700)
 }
