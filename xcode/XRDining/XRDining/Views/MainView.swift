@@ -159,6 +159,7 @@ struct MainView: View {
                     }
                     switch state {
                     case .joined:
+                        logInfo("Starting immersiveSpace..")
                         _ = await MainActor.run {
                                Task { @MainActor in
                                    _ = await openImmersiveSpace(id: appModel.immersiveSpaceID)
@@ -171,18 +172,8 @@ struct MainView: View {
                         break
                     }
 
-//                    if case .invalidated = state {
-//                        appModel.sessionController = nil
-//                        return
-//                    }
                 }
             }
-//            _ = await MainActor.run {
-//                   Task { @MainActor in
-//                       _ = await openImmersiveSpace(id: appModel.immersiveSpaceID)
-//                   }
-//               }
-            //await openImmersiveSpace(id: appModel.immersiveSpaceID)
         }
     }
     struct WelcomeBanner: View {

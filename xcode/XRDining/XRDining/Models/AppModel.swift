@@ -18,7 +18,7 @@ import GroupActivities
 
 @Observable @MainActor
 class AppModel {
-    
+    var nrOfReferenceObjects = 0
     var currentGroupSession: GroupSession<PersonasActivity>? = nil
     
     let modelsFromBundle = ["gebakske"]
@@ -331,18 +331,28 @@ class AppModel {
                 // the objects should be loaded first. After that the ARKit session can run with the configures providers
                 
                 logInfo("loading reference objects...")
-                await objectTracking.referenceObjectLoader.loadBuiltInReferenceObjects()
+                nrOfReferenceObjects = await objectTracking.referenceObjectLoader.loadBuiltInReferenceObjects()
                 logInfo("reference objects loaded")
                 Task {
                     await monitorSessionUpdates()
                 }
             }
+            //return "done"
         }
     }
     func setupContentEntity() -> Entity {
         return contentRoot
     }
+//    func countResources(in subfolder: String) -> Int {
+//        guard let urls = Bundle.module.urls(forResourcesWithExtension: nil,
+//                                            subdirectory: subfolder) else { return 0 }
+//        // keep only files (skip directories)
+//        return urls.filter { url in
+//            (try? url.resourceValues(forKeys: [.isDirectoryKey]).isDirectory) == false
+//        }.count
+//    }
 }
+
 //@MainActor
 let logger = Logger(subsystem: "com.biteplanet.XRDining", category: "general")
 

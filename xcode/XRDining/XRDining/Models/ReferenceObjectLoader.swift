@@ -42,12 +42,12 @@ final class ReferenceObjectLoader {
         }
     }
 
-    func loadBuiltInReferenceObjects() async {
+    func loadBuiltInReferenceObjects() async  -> Int {
         // Only allow one loading operation at any given time.
-        guard !didStartLoading else { return }
+        guard !didStartLoading else { return 0 }
         didStartLoading.toggle()
         
-        logger.info("[TRACKING] Looking for reference objects in the main bundle ...")
+        logInfo("[TRACKING] Looking for reference objects in the main bundle ...")
 
         // Get a list of all reference object files in the app's main bundle and attempt to load each.
         var referenceObjectFiles: [String] = []
@@ -67,12 +67,13 @@ final class ReferenceObjectLoader {
                 }
             }
         }
+        return fileCount
     }
     
     private func loadReferenceObject(_ url: URL) async {
         var referenceObject: ReferenceObject
         do {
-            print("Loading reference object from \(url)")
+            logInfo("Loading reference object from \(url)")
             // Load the file as a `ReferenceObject` - this can take a while for larger objects.
             try await referenceObject = ReferenceObject(from: url)
         } catch {
@@ -92,10 +93,10 @@ final class ReferenceObjectLoader {
 
             do {
                 // Load the contents of the USDZ file as an `Entity` that you attach to the anchor.
-                logger.info("TRACKING loading usdz model from \(usdzPath.absoluteString)")
+                logInfo("TRACKING loading usdz model from \(usdzPath.absoluteString)")
                 try await entity = Entity(contentsOf: usdzPath)
             } catch {
-                print("Failed to load model \(usdzPath.absoluteString)")
+                logInfo("Failed to load model \(usdzPath.absoluteString)")
             }
 
             usdzsPerReferenceObjectID[referenceObject.id] = entity

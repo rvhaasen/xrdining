@@ -59,6 +59,7 @@ struct ImmersiveView: View {
 //                    dismissWindow(id: "MainWindow")
 //                }
 //            }
+            logInfo("In open closure of ImmersiveView")
             appModel.sessionController?.updateLocalParticipantRole()
             content.add(appModel.setupContentEntity())
             
@@ -91,12 +92,12 @@ struct ImmersiveView: View {
             root.name = "root"
             content.add(root)
             scene.root = root
-            
+            logInfo("Leaving open closure of ImmersiveView")
         }
         update: { content, attachments in
             
             guard let root = scene.root else { return }
-            guard closing == false else { return }
+            guard appModel.immersiveSpaceState == .open else { return }
             
             // Insert any labels that aren't in the scene yet
             for id in appModel.activeAttachments where !inserted.contains(id) {
@@ -120,11 +121,6 @@ struct ImmersiveView: View {
 //            logger.info("SPHERE rotate in to \(appModel.sphereAngle)")
             if let foundEntity = content.entities.first(where: { $0.name == "sphere" }) {
                 // Use foundEntity
-//                logger.info("SPHERE object found")
-//                let rotation2 = simd_quatf(angle: Float(appModel.sphereAngle) * 2.0 * .pi/360.0, axis: [0, 1, 0])
-//                foundEntity.transform.rotation = rotation2
-                //let rotation2 = simd_quatf(angle: angle * 2.0 * .pi/360.0, axis: [0, 1, 0])
-//                foundEntity.transform.translation = [0,0, Float(appModel.positionOffset)]
                 foundEntity.transform.translation = [0,0, Float(appModel.screen2tableDistance)]
             }
         }
@@ -141,16 +137,12 @@ struct ImmersiveView: View {
             }
         }
         .onReceive(timer) { time in
-            print("Time, ticked, count is now \(count), nextStage is \(nextStageAt)")
+            logInfo("Time, ticked, count is now \(count), nextStage is \(nextStageAt)")
             defer {
                 count += 1
             }
-                   
-//            if (count ==  0) {
-//                appModel.currentGroupSession?.join()
-//            }
             if (count == nextStageAt) {
-                print("Count reached to next stage: \(nextStageAt)")
+                logInfo("Count reached to next stage: \(nextStageAt)")
                 if let item = it.next() as StageItem? {
                     
                     guard item.isEnabled else {
@@ -161,9 +153,9 @@ struct ImmersiveView: View {
                         return
                     }
                     nextStageAt += item.duration
-                    print("Duration for next video is \(item.duration) seconds")
+                    logInfo("Duration for next video is \(item.duration) seconds")
                     appModel.sphereAngle = Double(item.rotation)
-                    print("Next stage at \(nextStageAt)")
+                    logInfo("Next stage at \(nextStageAt)")
                     
                     if let audioURL = item.audioURL {
                         audio.playSound(url: audioURL)
@@ -172,54 +164,42 @@ struct ImmersiveView: View {
                         // Stop currently playing audio
                         audio.stop()
                     }
-                    print("Running next video...")
+                    logInfo("Running next video...")
                     
                     if let url = item.videoURL {
                         startVideo(url: url, volume: item.volume)
                     }
                     // Select course as activeAttachements if defined in stage
                     if item.pdfURL != nil {
-                        print("Enabling attachement \(item.title)")
+                        logInfo("Enabling attachement \(item.title)")
                         appModel.activeAttachments = [item.title]
                     }
                     else {
-                        print("No attachment for this stage, clearing activeAttachments")
+                        logInfo("No attachment for this stage, clearing activeAttachments")
                         appModel.activeAttachments = []
                     }
                 } else {
                     // Last stage has been processed, stop all, close views which puts the
                     // application to background
-                    closing = true
-                    stopVideo()
-                    logInfo("Done, exiting immersive space")
-                    audio.stop()
                     appModel.immersiveSpaceState = .inTransition
+                    
                     Task {
                         await dismissImmersiveSpace()
-                        nextStageAt = 0
                     }
-                    if let session = appModel.currentGroupSession {
-                        session.end()
-                        print("Ended shareplay session")
-                    }
-                    appModel.currentGroupSession = nil
-                    dismissWindow(id: "MainWindow")
                 }
             }
-
-            
-            //                    //audioFileExtension = "mp3"
-            //                    //audio.playSound(named: "nordsea_with_gulls", fileExtension: "mp3")
-            //            audio.stop()
-            //
-            //            if (!audioFile.isEmpty) {
-            //                audio.playSound(named: audioFile, fileExtension: audioFileExtension)
-            
-            
         }
         .onAppear {
             Task {
+                logInfo("Wait for reference object to be loaded...")
+                let ro = try? await waitForEnabledReferenceObjects(timeout: .seconds(10))
+                guard let ro, ro.count == appModel.nrOfReferenceObjects else {
+                    logInfo("No reference objects available (timeout or cancelled). Skipping object tracking.")
+                    return
+                }
+                logInfo("Reference objects loaded")
                 await appModel.runARKitSession()
+                logInfo("ARKit session started")
                 
                 // Wait for object anchor updates and maintain a dictionary of visualizations
                 // that are attached to those anchors.
@@ -261,6 +241,17 @@ struct ImmersiveView: View {
             }
             appModel.objectVisualizations.removeAll()
             logInfo("Removed object visualizations.")
+
+            stopVideo()
+            logInfo("Done, exiting immersive space")
+            audio.stop()
+
+            if let session = appModel.currentGroupSession {
+                session.end()
+                logInfo("Ended shareplay session")
+            }
+            appModel.currentGroupSession = nil
+            dismissWindow(id: "MainWindow")
 
             appModel.didLeaveImmersiveSpace()
         }
@@ -319,6 +310,25 @@ struct ImmersiveView: View {
         }
         entity.position = position
         entity.orientation = simd_quatf(angle: angle, axis: SIMD3<Float>(0, 1, 0))
+    }
+    struct ReferenceObjectsTimeoutError: Error {}
+
+    @MainActor
+    func waitForEnabledReferenceObjects(timeout: Duration? = .seconds(5)) async throws -> [ReferenceObject] {
+        let clock = ContinuousClock()
+        let start = clock.now
+
+        while true {
+            let refs = appModel.objectTracking.referenceObjectLoader.enabledReferenceObjects
+            if refs.count == 2 {
+                return refs
+            }
+            try Task.checkCancellation()
+            if let timeout, clock.now - start > timeout {
+                throw ReferenceObjectsTimeoutError()
+            }
+            try await Task.sleep(for: .milliseconds(100))
+        }
     }
 }
 @Observable
