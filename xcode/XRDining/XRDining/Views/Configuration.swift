@@ -10,6 +10,8 @@ import Playgrounds
 
 struct Configuration: View {
     @Environment(AppModel.self) var appModel
+    @Environment(LogStore.self) private var log
+    @Environment(\.openWindow) private var openWindow
 
     var body: some View {
         @Bindable var appModel = appModel
@@ -41,14 +43,22 @@ struct Configuration: View {
                 }
             }
             VStack(spacing: 20) {
+                VStack {
+                    Button("Open Debug Console") { openWindow(id: "console") }
+                    Button("Log sample") {
+                        log.info("Launched scene")
+                        log.warn("Low memory warning mock")
+                        log.error("Something failed: code=42")
+                    }
+                }
                 Toggle(isOn: Binding(
                     get: { appModel.isSingleUser },
                     set: { isOn in
                         if isOn {
-                            appModel.screen2tableDistance = appModel.singleUserScreen2tableDistance
+                            appModel.screen2tableDistance = AppModel.singleUserScreen2tableDistance
                             appModel.isSingleUser = true
                         } else {
-                            appModel.screen2tableDistance = appModel.dualUserscreen2tableDistance
+                            appModel.screen2tableDistance = AppModel.dualUserscreen2tableDistance
                             appModel.isSingleUser = false
                         }
                     }

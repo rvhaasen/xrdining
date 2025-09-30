@@ -37,6 +37,7 @@ struct DiningTemplate: SpatialTemplate {
     enum Role: String, SpatialTemplateRole {
         case caller
         case called
+        case test
     }
     
     var screenDistance: Double
@@ -50,13 +51,13 @@ struct DiningTemplate: SpatialTemplate {
             .seat(
                 position: player1Element,
                 direction: .lookingAt(player2Element),
-                role: Role.caller
+                //role: Role.caller
             ),
             .seat(
                 position: player2Element,
                 direction: .lookingAt(player1Element),
-                role: Role.called
-            )
+                //role: Role.called
+            ),
         ]
         return activeTeamSeats
     }

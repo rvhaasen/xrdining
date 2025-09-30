@@ -6,13 +6,15 @@
 //
 
 import SwiftUI
+import GroupActivities
 
 
 @main
 struct XRDiningApp: App {
 
     @State var appModel = AppModel()
-
+    @State private var log = LogStore()
+    
     var body: some Scene {
 
         Group {
@@ -22,6 +24,8 @@ struct XRDiningApp: App {
                 ZStack {
                     ImmersiveView()
                 }
+                .groupActivityAssociation(.primary(appModel.immersiveSpaceID))
+//                .groupActivityAssociation(.)
                 .onAppear {
                     appModel.immersiveSpaceState = .open
                 }
@@ -31,5 +35,6 @@ struct XRDiningApp: App {
             }
         }
         .environment(appModel)
+        .environment(log)
     }
 }

@@ -123,11 +123,11 @@ class AppModel {
     
     // TODO: refactor in order to make it content dependent,
     // If is isSingleUser == false, set screen2tableDistance to 0, else to 20
-    let singleUserScreen2tableDistance : Float = 0.0
-    let dualUserscreen2tableDistance : Float = 50.0
+    static let singleUserScreen2tableDistance : Float = 0.0
+    static let dualUserscreen2tableDistance : Float = 30.0
     
     var isSingleUser: Bool = false
-    var screen2tableDistance: Float
+    var screen2tableDistance = singleUserScreen2tableDistance
     
 
 //    var isSingleUser: Bool = true
@@ -292,11 +292,12 @@ class AppModel {
 
     // Constructor
     init() {
-        screen2tableDistance = singleUserScreen2tableDistance
         selectedWorld = VideoInfo.World.visvijver
         videoModel = VideoModel()
         videos[VideoInfo.World.visvijver] = VideoInfo(rotationDegrees: -90.0)
         videos[VideoInfo.World.visvijver_qoocam_topaz] = VideoInfo(rotationDegrees: 180.0)
+
+        screen2tableDistance = isSingleUser ? AppModel.singleUserScreen2tableDistance : AppModel.dualUserscreen2tableDistance
 
         
         if !isSimulator {

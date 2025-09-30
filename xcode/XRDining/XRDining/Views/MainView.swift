@@ -91,9 +91,10 @@ struct MainView: View {
                     } label: {
                         Text("VideoPicker")
                     }.padding(.bottom, 20)
-                    if appModel.isSingleUser {
-                        ToggleImmersiveSpaceButton(openImmersive: openImmersive)
-                    }
+                    ToggleImmersiveSpaceButton(openImmersive: openImmersive)
+//                    if appModel.isSingleUser {
+//                        ToggleImmersiveSpaceButton(openImmersive: openImmersive)
+//                    }
                 }
                 .font(.title2)
                 .padding(.bottom, 20)
@@ -137,9 +138,17 @@ struct MainView: View {
                 continue
             }
             logInfo("New shareplay session, opening immersiveSpace")
-            await openImmersiveSpace(id: appModel.immersiveSpaceID)
+            
+            // For the application instance that initiates the interaction
+            // the default spatial template-role ( .called ) is set to .caller
+            // in the shareplay button code.
+            // This defines the positions of the 2 users, the initiator as .caller
+            // and the other as .called
+            
+            sessionController.updateLocalParticipantRole()
             
             appModel.sessionController = sessionController
+
 
             // Create a task to observe the group session state and clear the
             // session controller when the group session invalidates.
@@ -148,13 +157,32 @@ struct MainView: View {
                     guard appModel.sessionController?.session.id == session.id else {
                         return
                     }
-
-                    if case .invalidated = state {
+                    switch state {
+                    case .joined:
+                        _ = await MainActor.run {
+                               Task { @MainActor in
+                                   _ = await openImmersiveSpace(id: appModel.immersiveSpaceID)
+                               }
+                           }
+                    case .invalidated:
                         appModel.sessionController = nil
                         return
+                    default:
+                        break
                     }
+
+//                    if case .invalidated = state {
+//                        appModel.sessionController = nil
+//                        return
+//                    }
                 }
             }
+//            _ = await MainActor.run {
+//                   Task { @MainActor in
+//                       _ = await openImmersiveSpace(id: appModel.immersiveSpaceID)
+//                   }
+//               }
+            //await openImmersiveSpace(id: appModel.immersiveSpaceID)
         }
     }
     struct WelcomeBanner: View {

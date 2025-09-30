@@ -67,7 +67,9 @@ struct SharePlayButton<ActivityType: GroupActivity & Transferable & Sendable>: V
                     // side of the 'called'. It is important to know
                     // the position in order to rotate the menu-screen
                     // correctly toward each user
+                    
                     appModel.spatialTemplateRole = DiningTemplate.Role.caller
+                    
                     Task.detached {
                         do {
                             _ = try await activity.activate()

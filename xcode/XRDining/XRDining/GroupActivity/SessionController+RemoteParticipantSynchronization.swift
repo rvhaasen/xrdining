@@ -6,6 +6,7 @@ A session controller extension that synchronizes the app's state with the ShareP
 */
 
 import GroupActivities
+internal import Combine
 
 extension SessionController {
     func shareLocalPlayerState(_ newValue: PlayerModel) {
@@ -38,7 +39,7 @@ extension SessionController {
     }
     
     func observeRemoteParticipantUpdates() {
-        //        observeActiveRemoteParticipants()
+        observeActiveRemoteParticipants()
         //        observeRemoteGameModelUpdates()
         observeRemotePlayerModelUpdates()
     }
@@ -81,51 +82,51 @@ extension SessionController {
         }
     }
     
-    //    private func observeActiveRemoteParticipants() {
-    //        // Create a list of remote participants by removing the local participant from the group
-    //        // session's list of active participants.
-    //        let activeRemoteParticipants = session.$activeParticipants.map {
-    //            $0.subtracting([self.session.localParticipant])
-    //        }
-    //        .withPrevious()
-    //        .values
-    //
-    //        Task {
-    //            // Listen for game state messages from other players with the group session messenger.
-    //            // Update local game state with the returned message and context.
-    //            for await (oldActiveParticipants, currentActiveParticipants) in activeRemoteParticipants {
-    //                let oldActiveParticipants = oldActiveParticipants ?? []
-    //
-    //                let newParticipants = currentActiveParticipants.subtracting(oldActiveParticipants)
-    //                let removedParticipants = oldActiveParticipants.subtracting(currentActiveParticipants)
-    //
-    //                if !newParticipants.isEmpty {
-    //                    // Send new participants the current state of the game.
-    //                    do {
-    //                        let gameMessage = GameMessage(
-    //                            game: game,
-    //                            editCount: gameSyncStore.editCount
-    //                        )
-    //                        try await messenger.send(gameMessage, to: .only(newParticipants))
-    //                    } catch {
-    //                        print("Failed to send game catchup message, \(error)")
-    //                    }
-    //
-    //                    // Send new participants the player model of the local participant.
-    //                    do {
-    //                        try await messenger.send(localPlayer, to: .only(newParticipants))
-    //                    } catch {
-    //                        print("Failed to send player catchup message, \(error)")
-    //                    }
-    //                }
-    //
-    //                // Remove any participants that have left from the active players dictionary.
-    //                for participant in removedParticipants {
-    //                    players[participant] = nil
-    //                }
-    //            }
-    //        }
-    //    }
+        private func observeActiveRemoteParticipants() {
+            // Create a list of remote participants by removing the local participant from the group
+            // session's list of active participants.
+            let activeRemoteParticipants = session.$activeParticipants.map {
+                $0.subtracting([self.session.localParticipant])
+            }
+            .withPrevious()
+            .values
+    
+            Task {
+                // Listen for game state messages from other players with the group session messenger.
+                // Update local game state with the returned message and context.
+                for await (oldActiveParticipants, currentActiveParticipants) in activeRemoteParticipants {
+                    let oldActiveParticipants = oldActiveParticipants ?? []
+    
+                    let newParticipants = currentActiveParticipants.subtracting(oldActiveParticipants)
+                    let removedParticipants = oldActiveParticipants.subtracting(currentActiveParticipants)
+    
+                    if !newParticipants.isEmpty {
+                        // Send new participants the current state of the game.
+                        do {
+                            let gameMessage = GameMessage(
+                                game: game,
+                                editCount: gameSyncStore.editCount
+                            )
+                            try await messenger.send(gameMessage, to: .only(newParticipants))
+                        } catch {
+                            print("Failed to send game catchup message, \(error)")
+                        }
+    
+                        // Send new participants the player model of the local participant.
+                        do {
+                            try await messenger.send(localPlayer, to: .only(newParticipants))
+                        } catch {
+                            print("Failed to send player catchup message, \(error)")
+                        }
+                    }
+    
+                    // Remove any participants that have left from the active players dictionary.
+                    for participant in removedParticipants {
+                        players[participant] = nil
+                    }
+                }
+            }
+        }
     
     struct GameSyncStore {
         var editCount: Int = 0

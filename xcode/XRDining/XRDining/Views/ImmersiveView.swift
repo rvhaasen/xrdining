@@ -59,6 +59,7 @@ struct ImmersiveView: View {
 //                    dismissWindow(id: "MainWindow")
 //                }
 //            }
+            appModel.sessionController?.updateLocalParticipantRole()
             content.add(appModel.setupContentEntity())
             
             // Create placeholder material, it will be replaced by VideoMaterial when video is loaded
@@ -144,7 +145,10 @@ struct ImmersiveView: View {
             defer {
                 count += 1
             }
-                        
+                   
+//            if (count ==  0) {
+//                appModel.currentGroupSession?.join()
+//            }
             if (count == nextStageAt) {
                 print("Count reached to next stage: \(nextStageAt)")
                 if let item = it.next() as StageItem? {
@@ -310,6 +314,8 @@ struct ImmersiveView: View {
         } else {
             position = .init(Vector3D(x: 0, y: 1.0, z: appModel.screen2tableDistance-0.5))
             angle = appModel.spatialTemplateRole == DiningTemplate.Role.caller ? -.pi / 4 : .pi / 4
+            // RH
+            angle=0
         }
         entity.position = position
         entity.orientation = simd_quatf(angle: angle, axis: SIMD3<Float>(0, 1, 0))

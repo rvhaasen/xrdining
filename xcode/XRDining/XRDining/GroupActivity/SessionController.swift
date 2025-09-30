@@ -25,14 +25,14 @@ final class SessionController {
         }
     }
     var players = [Participant: PlayerModel]()
-//    {
-//        didSet {
-//            if oldValue != players {
-//                updateCurrentPlayer()
-//                updateLocalParticipantRole()
-//            }
-//        }
-//    }
+    {
+        didSet {
+            if oldValue != players {
+                //updateCurrentPlayer()
+                updateLocalParticipantRole()
+            }
+        }
+    }
     var localPlayer: PlayerModel {
         get {
             players[session.localParticipant]!
@@ -70,15 +70,20 @@ final class SessionController {
         // RH It seems that next call does not apply the Spatial template yet,
         // After session.join() the default template is applied (persons in circular area around the screen)
         // Only after showing the immersive view, the template is applied...
-        //updateSpatialTemplatePreference()
+        updateSpatialTemplatePreference()
         //gameStateChanged()
-        
+        // Create a representation of the local participant.
+        localPlayer = PlayerModel(
+            id: session.localParticipant.id
+            //name: appModel.playerName
+        )
         observeRemoteParticipantUpdates()
         configureSystemCoordinator()
 
-        gameStateChanged()
+//        gameStateChanged()
 
         session.join()
+        gameStateChanged()
     }
     func updateSpatialTemplatePreference() {
         systemCoordinator.configuration.spatialTemplatePreference = .custom(DiningTemplate(screenDistance: screenDistance))
@@ -86,6 +91,13 @@ final class SessionController {
     func configureSystemCoordinator() {
         // Let the system coordinator show each players' spatial Persona in the immersive space.
         systemCoordinator.configuration.supportsGroupImmersiveSpace = true
+        
+        Task {
+            // Wait for gameplay updates from participants.
+            for await localParticipantState in systemCoordinator.localParticipantStates {
+                localPlayer.seatPose = localParticipantState.seat?.pose
+            }
+        }
     }
     func gameStateChanged() {
         updateSpatialTemplatePreference()
@@ -93,13 +105,13 @@ final class SessionController {
     }
     func updateLocalParticipantRole() {
         // Set and unset the participant's spatial template role based on updating game state.
-        switch game.stage {
-            case .waiting:
-                //systemCoordinator.resignRole()
-                systemCoordinator.assignRole(spatialTemplateRole)
-            case .active:
-                systemCoordinator.assignRole(spatialTemplateRole)
-        }
+//        switch game.stage {
+//            case .waiting:
+//                //systemCoordinator.resignRole()
+//                systemCoordinator.assignRole(spatialTemplateRole)
+//            case .active:
+//                systemCoordinator.assignRole(spatialTemplateRole)
+//        }
     }
  
 }
