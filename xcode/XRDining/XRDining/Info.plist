@@ -6,8 +6,6 @@
 	<array>
 		<dict/>
 	</array>
-	<key>NSWorldSensingUsageDescription</key>
-	<string>App needs to track user location</string>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationPreferredDefaultSceneSessionRole</key>

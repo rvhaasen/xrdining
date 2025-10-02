@@ -15,8 +15,8 @@ import SwiftUI
 import UniformTypeIdentifiers
 
 // MARK: - Model
-struct StageItem: Identifiable, Equatable {
-    let id: UUID = .init()
+struct StageItem: Identifiable, Equatable, Codable {
+    let id: UUID
     var title: String
     var videoURL: URL? = nil
     var audioURL: URL? = nil
@@ -28,6 +28,173 @@ struct StageItem: Identifiable, Equatable {
     var pdfURL: URL? = nil
     var usdzURL: URL? = nil
     var modelFromBundle: String = ""
+
+    init(id: UUID = .init(),
+         title: String,
+         videoURL: URL? = nil,
+         audioURL: URL? = nil,
+         duration: Int = 0,
+         rotation: Int = 0,
+         notes: String = "",
+         isEnabled: Bool = true,
+         volume: Float = 1.0,
+         pdfURL: URL? = nil,
+         usdzURL: URL? = nil,
+         modelFromBundle: String = "") {
+        self.id = id
+        self.title = title
+        self.videoURL = videoURL
+        self.audioURL = audioURL
+        self.duration = duration
+        self.rotation = rotation
+        self.notes = notes
+        self.isEnabled = isEnabled
+        self.volume = volume
+        self.pdfURL = pdfURL
+        self.usdzURL = usdzURL
+        self.modelFromBundle = modelFromBundle
+    }
+
+    private enum CodingKeys: String, CodingKey {
+        case id, title, duration, rotation, notes, isEnabled, volume, modelFromBundle
+        case videoBookmark, audioBookmark, pdfBookmark, usdzBookmark
+    }
+
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(id, forKey: .id)
+        try container.encode(title, forKey: .title)
+        try container.encode(duration, forKey: .duration)
+        try container.encode(rotation, forKey: .rotation)
+        try container.encode(notes, forKey: .notes)
+        try container.encode(isEnabled, forKey: .isEnabled)
+        try container.encode(volume, forKey: .volume)
+        try container.encode(modelFromBundle, forKey: .modelFromBundle)
+
+        if let url = videoURL {
+            if let data = try? url.bookmarkData( includingResourceValuesForKeys: nil, relativeTo: nil) {
+                try container.encode(data, forKey: .videoBookmark)
+            }
+        }
+        if let url = audioURL {
+            if let data = try? url.bookmarkData(includingResourceValuesForKeys: nil, relativeTo: nil) {
+                try container.encode(data, forKey: .audioBookmark)
+            }
+        }
+        if let url = pdfURL {
+            if let data = try? url.bookmarkData(includingResourceValuesForKeys: nil, relativeTo: nil) {
+                try container.encode(data, forKey: .pdfBookmark)
+            }
+        }
+        if let url = usdzURL {
+            if let data = try? url.bookmarkData( includingResourceValuesForKeys: nil, relativeTo: nil) {
+                try container.encode(data, forKey: .usdzBookmark)
+            }
+        }
+    }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        id = try container.decode(UUID.self, forKey: .id)
+        title = try container.decode(String.self, forKey: .title)
+        duration = try container.decodeIfPresent(Int.self, forKey: .duration) ?? 0
+        rotation = try container.decodeIfPresent(Int.self, forKey: .rotation) ?? 0
+        notes = try container.decodeIfPresent(String.self, forKey: .notes) ?? ""
+        isEnabled = try container.decodeIfPresent(Bool.self, forKey: .isEnabled) ?? true
+        volume = try container.decodeIfPresent(Float.self, forKey: .volume) ?? 1.0
+        modelFromBundle = try container.decodeIfPresent(String.self, forKey: .modelFromBundle) ?? ""
+
+        func resolve(_ key: CodingKeys) -> URL? {
+            guard let data = try? container.decode(Data.self, forKey: key) else { return nil }
+            var stale = false
+            // Try resolving as a security-scoped bookmark first, fall back to standard if needed
+            if let url = try? URL(resolvingBookmarkData: data, relativeTo: nil, bookmarkDataIsStale: &stale) {
+                return url
+            } else if let url = try? URL(resolvingBookmarkData: data, options: [], relativeTo: nil, bookmarkDataIsStale: &stale) {
+                return url
+            } else {
+                return nil
+            }
+        }
+
+        videoURL = resolve(.videoBookmark)
+        audioURL = resolve(.audioBookmark)
+        pdfURL = resolve(.pdfBookmark)
+        usdzURL = resolve(.usdzBookmark)
+    }
+}
+
+// MARK: - File Persistence Helpers
+private func appSupportContainer() throws -> URL {
+    let fm = FileManager.default
+    let base = try fm.url(for: .applicationSupportDirectory, in: .userDomainMask, appropriateFor: nil, create: true)
+    let dir = base.appendingPathComponent("StageAssets", isDirectory: true)
+    if !fm.fileExists(atPath: dir.path) {
+        try fm.createDirectory(at: dir, withIntermediateDirectories: true)
+    }
+    return dir
+}
+
+private func subfolderURL(_ name: String) throws -> URL {
+    let root = try appSupportContainer()
+    let dir = root.appendingPathComponent(name, isDirectory: true)
+    let fm = FileManager.default
+    if !fm.fileExists(atPath: dir.path) {
+        try fm.createDirectory(at: dir, withIntermediateDirectories: true)
+    }
+    return dir
+}
+
+private func uniqueDestinationURL(for sourceURL: URL, in directory: URL) -> URL {
+    let fm = FileManager.default
+    let ext = sourceURL.pathExtension
+    let baseName = sourceURL.deletingPathExtension().lastPathComponent
+    var candidate = directory.appendingPathComponent(sourceURL.lastPathComponent)
+    var counter = 2
+    while fm.fileExists(atPath: candidate.path) {
+        let newName = "\(baseName) \(counter)"
+        candidate = directory.appendingPathComponent(newName).appendingPathExtension(ext)
+        counter += 1
+    }
+    return candidate
+}
+
+private func copyToAppContainer(_ sourceURL: URL, subfolder: String) throws -> URL {
+    let fm = FileManager.default
+
+    // Ensure iCloud file is available
+    if fm.isUbiquitousItem(at: sourceURL) {
+        try? fm.startDownloadingUbiquitousItem(at: sourceURL)
+    }
+
+    var needsStop = false
+    if sourceURL.startAccessingSecurityScopedResource() {
+        needsStop = true
+    }
+    defer {
+        if needsStop { sourceURL.stopAccessingSecurityScopedResource() }
+    }
+
+    let destDir = try subfolderURL(subfolder)
+    let destURL = uniqueDestinationURL(for: sourceURL, in: destDir)
+
+    // If selecting a file that's already at the destination, just return it
+    if sourceURL.standardizedFileURL == destURL.standardizedFileURL {
+        return destURL
+    }
+
+    do {
+        if fm.fileExists(atPath: destURL.path) {
+            try fm.removeItem(at: destURL)
+        }
+        try fm.copyItem(at: sourceURL, to: destURL)
+    } catch {
+        // Fallback to read/write in case a coordinated copy fails
+        let data = try Data(contentsOf: sourceURL)
+        try data.write(to: destURL, options: [.atomic])
+    }
+
+    return destURL
 }
 
 // MARK: - Main List
@@ -113,9 +280,6 @@ struct NewItemSheet: View {
     @State private var showBundleAudioPicker = false
     @State private var showBundlePdfPicker = false
 
-    @State private var pickedURL: URL?
-    @State private var hasSecurityScope = false
-    
     enum ImportType {
         case video
         case audio
@@ -260,19 +424,24 @@ struct NewItemSheet: View {
             }(), allowsMultipleSelection: false) { result in
                 switch result {
                 case .success(let urls):
-                    if let selected = urls.first {
-                        let url2 = handlePickedURL(selected)
-                        switch importType {
-                        case .video:
-                            videoURL = url2
-                        case .audio:
-                            audioURL = selected
-                        case .pdf:
-                            pdfURL = selected
-                        case .usdz:
-                            usdzURL = selected
-                        case nil:
-                            break
+                    if let selected = urls.first, let type = importType {
+                        do {
+                            switch type {
+                            case .video:
+                                let local = try copyToAppContainer(selected, subfolder: "Videos")
+                                videoURL = local
+                            case .audio:
+                                let local = try copyToAppContainer(selected, subfolder: "Audio")
+                                audioURL = local
+                            case .pdf:
+                                let local = try copyToAppContainer(selected, subfolder: "PDFs")
+                                pdfURL = local
+                            case .usdz:
+                                let local = try copyToAppContainer(selected, subfolder: "Models")
+                                usdzURL = local
+                            }
+                        } catch {
+                            fileImportError = error
                         }
                     }
                 case .failure(let error):
@@ -321,29 +490,11 @@ struct NewItemSheet: View {
         }
     }
     private func handlePickedURL(_ url: URL) -> URL {
-        // Clean up previous selection
-        stopAccessIfNeeded()
-
-        // Gain access to a security-scoped file from Files/iCloud
-        hasSecurityScope = url.startAccessingSecurityScopedResource()
-
         // If this lives in iCloud, trigger download if needed
         if FileManager.default.isUbiquitousItem(at: url) {
             try? FileManager.default.startDownloadingUbiquitousItem(at: url)
         }
-
-        //pickedURL = url
-        //player = AVPlayer(url: url)
-        //player?.automaticallyWaitsToMinimizeStalling = true
-        //player?.play()
         return url
-    }
-
-    private func stopAccessIfNeeded() {
-        if hasSecurityScope, let pickedURL {
-            pickedURL.stopAccessingSecurityScopedResource()
-        }
-        hasSecurityScope = false
     }
 }
 
@@ -357,9 +508,6 @@ struct StageEditor: View {
     @State private var showBundleAudioPicker = false
     @State private var showBundlePdfPicker = false
     @State private var showFileImporter = false
-    
-    @State private var pickedURL: URL?
-    @State private var hasSecurityScope = false
     
     enum ImportType {
         case video
@@ -408,6 +556,10 @@ struct StageEditor: View {
                     if let url = item.videoURL {
                         Text(url.lastPathComponent).font(.footnote).foregroundStyle(.secondary)
                     }
+                    Spacer()
+                    Button ("Cancel") {
+                        item.videoURL = nil
+                    }
                 }
                 HStack {
                     Text("Volume of audio in video (0 .. 1.0)")
@@ -432,6 +584,10 @@ struct StageEditor: View {
                     if let url = item.audioURL {
                         Text(url.lastPathComponent).font(.footnote).foregroundStyle(.secondary)
                     }
+                    Spacer()
+                    Button ("Cancel") {
+                        item.audioURL = nil
+                    }
                 }
                 HStack {
                     Button {
@@ -442,6 +598,10 @@ struct StageEditor: View {
                     }
                     if let url = item.pdfURL {
                         Text(url.lastPathComponent).font(.footnote).foregroundStyle(.secondary)
+                    }
+                    Spacer()
+                    Button ("Cancel") {
+                        item.pdfURL = nil
                     }
                 }
                 Button {
@@ -487,19 +647,24 @@ struct StageEditor: View {
         }(), allowsMultipleSelection: false) { result in
             switch result {
             case .success(let urls):
-                if let selected = urls.first {
-                    let url2 = handlePickedURL(selected)
-                    switch importType {
-                    case .video:
-                        item.videoURL = url2
-                    case .audio:
-                        item.audioURL = selected
-                    case .pdf:
-                        item.pdfURL = selected
-                    case .usdz:
-                        item.usdzURL = selected
-                    case nil:
-                        break
+                if let selected = urls.first, let type = importType {
+                    do {
+                        switch type {
+                        case .video:
+                            let local = try copyToAppContainer(selected, subfolder: "Videos")
+                            item.videoURL = local
+                        case .audio:
+                            let local = try copyToAppContainer(selected, subfolder: "Audio")
+                            item.audioURL = local
+                        case .pdf:
+                            let local = try copyToAppContainer(selected, subfolder: "PDFs")
+                            item.pdfURL = local
+                        case .usdz:
+                            let local = try copyToAppContainer(selected, subfolder: "Models")
+                            item.usdzURL = local
+                        }
+                    } catch {
+                        fileImportError = error
                     }
                 }
             case .failure(let error):
@@ -545,29 +710,11 @@ struct StageEditor: View {
 
     }
     private func handlePickedURL(_ url: URL) -> URL {
-        // Clean up previous selection
-        stopAccessIfNeeded()
-
-        // Gain access to a security-scoped file from Files/iCloud
-        hasSecurityScope = url.startAccessingSecurityScopedResource()
-
         // If this lives in iCloud, trigger download if needed
         if FileManager.default.isUbiquitousItem(at: url) {
             try? FileManager.default.startDownloadingUbiquitousItem(at: url)
         }
-
-        //pickedURL = url
-        //player = AVPlayer(url: url)
-        //player?.automaticallyWaitsToMinimizeStalling = true
-        //player?.play()
         return url
-    }
-
-    private func stopAccessIfNeeded() {
-        if hasSecurityScope, let pickedURL {
-            pickedURL.stopAccessingSecurityScopedResource()
-        }
-        hasSecurityScope = false
     }
 }
 

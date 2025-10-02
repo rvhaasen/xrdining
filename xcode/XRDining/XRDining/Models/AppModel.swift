@@ -24,11 +24,11 @@ class AppModel {
     let modelsFromBundle = ["gebakske"]
     
     // Definition of scenes
-    var items: [StageItem] = []
+    var items: [StageItem] = [] { didSet { if !isLoadingState { scheduleSave() } } }
     
     // List of attachments (used for course-description)
-    var activeAttachments: [String] = []
-    var insertedAttachments: Set<String> = Set<String>()
+    var activeAttachments: [String] = [] { didSet { if !isLoadingState { scheduleSave() } } }
+    var insertedAttachments: Set<String> = Set<String>() { didSet { if !isLoadingState { scheduleSave() } } }
 
     // Set default role to called,
     // For the initiator of it will be set to 'called'
@@ -53,8 +53,8 @@ class AppModel {
     var imageWidth: Float = 0
     var imageHeight: Float = 0
     
-    var sphereAngle: Double = 0.0
-    var positionOffset: Double = 0.0
+    var sphereAngle: Double = 0.0 { didSet { if !isLoadingState { scheduleSave() } } }
+    var positionOffset: Double = 0.0 { didSet { if !isLoadingState { scheduleSave() } } }
 
     // Detected images will create an entity that  detected images that will be added to contentRoot. For removing .removeFromParent is used on the particular entity. During setup of the reality-view the contentRoot is added to the scene.
     let contentRoot = Entity()
@@ -113,7 +113,7 @@ class AppModel {
         }
     }
     
-    var doObjectDetection: Bool = false
+    var doObjectDetection: Bool = false { didSet { if !isLoadingState { scheduleSave() } } }
     
     var immersiveSpaceState : ImmersiveSpaceState = .closed
     
@@ -121,12 +121,98 @@ class AppModel {
     
     var videoModel: VideoModel?
     
+    // MARK: - Persistence
+    private var saveTask: Task<Void, Never>?
+    private var isLoadingState = false
+    private static let stateFileName = "AppModelState.json"
+    private static var stateFileURL: URL {
+        let fm = FileManager.default
+        let base = fm.urls(for: .applicationSupportDirectory, in: .userDomainMask).first!
+        return base.appendingPathComponent(stateFileName)
+    }
+
+    struct PersistentState: Codable {
+        var isSingleUser: Bool
+        var activeAttachments: [String]
+        var insertedAttachments: Set<String>
+        var doObjectDetection: Bool
+        var sphereAngle: Double
+        var positionOffset: Double
+        var items: [StageItem]
+    }
+
+    private func scheduleSave() {
+        saveTask?.cancel()
+        saveTask = Task { [weak self] in
+            // Debounce saves to avoid frequent disk writes
+            try? await Task.sleep(nanoseconds: 500_000_000)
+            self?.savePersistentState()
+        }
+    }
+
+    private func savePersistentState() {
+        let state = PersistentState(
+            isSingleUser: isSingleUser,
+            activeAttachments: activeAttachments,
+            insertedAttachments: insertedAttachments,
+            doObjectDetection: doObjectDetection,
+            sphereAngle: sphereAngle,
+            positionOffset: positionOffset,
+            items: items
+        )
+        do {
+            let encoder = JSONEncoder()
+            encoder.outputFormatting = [.prettyPrinted]
+            let data = try encoder.encode(state)
+            let url = AppModel.stateFileURL
+            let dir = url.deletingLastPathComponent()
+            try FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
+            try data.write(to: url, options: [.atomic])
+            logInfo("AppModel state saved to: \(url.path)")
+        } catch {
+            logError("Failed to save AppModel state: \(error)")
+        }
+    }
+
+    private func loadPersistentState() {
+        let url = AppModel.stateFileURL
+        guard FileManager.default.fileExists(atPath: url.path) else {
+            logInfo("No persisted AppModel state found at: \(url.path)")
+            return
+        }
+        do {
+            let data = try Data(contentsOf: url)
+            let decoder = JSONDecoder()
+            let state = try decoder.decode(PersistentState.self, from: data)
+            isLoadingState = true
+            isSingleUser = state.isSingleUser
+            activeAttachments = state.activeAttachments
+            insertedAttachments = state.insertedAttachments
+            doObjectDetection = state.doObjectDetection
+            sphereAngle = state.sphereAngle
+            positionOffset = state.positionOffset
+            items = state.items
+            isLoadingState = false
+            // Ensure dependent value reflects loaded state
+            screen2tableDistance = isSingleUser ? AppModel.singleUserScreen2tableDistance : AppModel.dualUserscreen2tableDistance
+            logInfo("AppModel state loaded from: \(url.path)")
+        } catch {
+            isLoadingState = false
+            logError("Failed to load AppModel state: \(error)")
+        }
+    }
+    
     // TODO: refactor in order to make it content dependent,
     // If is isSingleUser == false, set screen2tableDistance to 0, else to 20
     static let singleUserScreen2tableDistance : Float = 0.0
     static let dualUserscreen2tableDistance : Float = 30.0
     
-    var isSingleUser: Bool = false
+    var isSingleUser: Bool = false {
+        didSet {
+            screen2tableDistance = isSingleUser ? AppModel.singleUserScreen2tableDistance : AppModel.dualUserscreen2tableDistance
+            if !isLoadingState { scheduleSave() }
+        }
+    }
     var screen2tableDistance = singleUserScreen2tableDistance
     
 
@@ -296,6 +382,7 @@ class AppModel {
         videoModel = VideoModel()
         videos[VideoInfo.World.visvijver] = VideoInfo(rotationDegrees: -90.0)
         videos[VideoInfo.World.visvijver_qoocam_topaz] = VideoInfo(rotationDegrees: 180.0)
+        loadPersistentState()
 
         screen2tableDistance = isSingleUser ? AppModel.singleUserScreen2tableDistance : AppModel.dualUserscreen2tableDistance
 
@@ -362,3 +449,4 @@ func logInfo(_ message: String) {
 func logError(_ message: String) {
     logger.error("\(message, privacy: .public)")
 }
+
