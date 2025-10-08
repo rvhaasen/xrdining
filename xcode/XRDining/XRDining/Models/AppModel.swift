@@ -27,8 +27,8 @@ class AppModel {
     var items: [StageItem] = [] { didSet { if !isLoadingState { scheduleSave() } } }
     
     // List of attachments (used for course-description)
-    var activeAttachments: [String] = [] { didSet { if !isLoadingState { scheduleSave() } } }
-    var insertedAttachments: Set<String> = Set<String>() { didSet { if !isLoadingState { scheduleSave() } } }
+    var activeAttachments: [String] = []
+    var insertedAttachments: Set<String> = Set<String>()
 
     // Set default role to called,
     // For the initiator of it will be set to 'called'
@@ -53,8 +53,8 @@ class AppModel {
     var imageWidth: Float = 0
     var imageHeight: Float = 0
     
-    var sphereAngle: Double = 0.0 { didSet { if !isLoadingState { scheduleSave() } } }
-    var positionOffset: Double = 0.0 { didSet { if !isLoadingState { scheduleSave() } } }
+    var sphereAngle: Double = 0.0 //{ didSet { if !isLoadingState { scheduleSave() } } }
+    var positionOffset: Double = 0.0 //{ didSet { if !isLoadingState { scheduleSave() } } }
 
     // Detected images will create an entity that  detected images that will be added to contentRoot. For removing .removeFromParent is used on the particular entity. During setup of the reality-view the contentRoot is added to the scene.
     let contentRoot = Entity()
@@ -133,11 +133,7 @@ class AppModel {
 
     struct PersistentState: Codable {
         var isSingleUser: Bool
-        var activeAttachments: [String]
-        var insertedAttachments: Set<String>
         var doObjectDetection: Bool
-        var sphereAngle: Double
-        var positionOffset: Double
         var items: [StageItem]
     }
 
@@ -153,11 +149,7 @@ class AppModel {
     private func savePersistentState() {
         let state = PersistentState(
             isSingleUser: isSingleUser,
-            activeAttachments: activeAttachments,
-            insertedAttachments: insertedAttachments,
             doObjectDetection: doObjectDetection,
-            sphereAngle: sphereAngle,
-            positionOffset: positionOffset,
             items: items
         )
         do {
@@ -186,11 +178,7 @@ class AppModel {
             let state = try decoder.decode(PersistentState.self, from: data)
             isLoadingState = true
             isSingleUser = state.isSingleUser
-            activeAttachments = state.activeAttachments
-            insertedAttachments = state.insertedAttachments
             doObjectDetection = state.doObjectDetection
-            sphereAngle = state.sphereAngle
-            positionOffset = state.positionOffset
             items = state.items
             isLoadingState = false
             // Ensure dependent value reflects loaded state

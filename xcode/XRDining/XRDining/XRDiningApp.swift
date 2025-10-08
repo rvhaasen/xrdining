@@ -24,7 +24,8 @@ struct XRDiningApp: App {
                 ZStack {
                     ImmersiveView()
                 }
-                .groupActivityAssociation(.primary(appModel.immersiveSpaceID))
+//                .groupActivityAssociation(.primary(appModel.immersiveSpaceID))
+                .groupActivityAssociation(.none)
                 .onAppear {
                     appModel.immersiveSpaceState = .open
                 }

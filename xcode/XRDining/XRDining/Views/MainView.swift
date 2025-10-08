@@ -120,6 +120,7 @@ struct MainView: View {
                     // Make sure to leave the immersive space if this view is no longer active
                     // - such as when a person closes this view - otherwise they may be stuck
                     // in the immersive space without the controls this view provides.
+//                    openImmersive()
                     if appModel.immersiveSpaceState == .open {
                         Task {
                             await dismissImmersiveSpace()
@@ -160,11 +161,12 @@ struct MainView: View {
                     switch state {
                     case .joined:
                         logInfo("Starting immersiveSpace..")
-                        _ = await MainActor.run {
-                               Task { @MainActor in
-                                   _ = await openImmersiveSpace(id: appModel.immersiveSpaceID)
-                               }
-                           }
+                        _ = await openImmersiveSpace(id: appModel.immersiveSpaceID)
+//                        _ = await MainActor.run {
+//                               Task { @MainActor in
+//                                   _ = await openImmersiveSpace(id: appModel.immersiveSpaceID)
+//                               }
+//                           }
                     case .invalidated:
                         appModel.sessionController = nil
                         return

@@ -77,7 +77,7 @@ final class SessionController {
             id: session.localParticipant.id
             //name: appModel.playerName
         )
-        observeRemoteParticipantUpdates()
+        //observeRemoteParticipantUpdates()
         configureSystemCoordinator()
 
 //        gameStateChanged()

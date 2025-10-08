@@ -15,8 +15,8 @@ struct XRDiningWindow : Scene {
     var body: some Scene {
         WindowGroup(id: "MainWindow") {
             MainView()
-//            .groupActivityAssociation(.primary("MainWindow"))
-            .groupActivityAssociation(.none)
+            .groupActivityAssociation(.primary("MainWindow"))
+//            .groupActivityAssociation(.none)
             //.frame(width: 800, height: 800)
             .frame(minWidth: 300, idealWidth: 800, maxWidth: 1200, minHeight: 300, idealHeight: 800, maxHeight: 900)
             //        .opacity(appModel.gardenOpen ? 0 : 1)

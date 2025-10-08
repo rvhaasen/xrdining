@@ -40,8 +40,12 @@ struct ImmersiveView: View {
         var it = appModel.items.makeIterator()
         //var currentItem = it.next() as StageItem?
         var nextStageAt: Int = 0
-        
+//        var count = 0
+
         var closing = false
+        
+//        var activeAttachments: [String] = []
+//        var insertedAttachments: Set<String> = Set<String>()
         
         RealityView { content, attachments  in
                         
@@ -101,10 +105,12 @@ struct ImmersiveView: View {
             
             // Insert any labels that aren't in the scene yet
             for id in appModel.activeAttachments where !inserted.contains(id) {
+            //for id in activeAttachments where !inserted.contains(id) {
                 if let e = attachments.entity(for: "\(id)") {
                     // Set the name of the entity so it can be found when it needs to be removed
                     e.name = id
                     root.addChild(e)
+                    //insertedAttachments.insert(id)
                     appModel.insertedAttachments.insert(id)
                     attachments.entity(for: id).map(updatePodiumPose(_:))
                 }
@@ -112,10 +118,12 @@ struct ImmersiveView: View {
 
             // Remove entities for labels that were deleted
             for gone in appModel.insertedAttachments.subtracting(appModel.activeAttachments) {
+//            for gone in insertedAttachments.subtracting(activeAttachments) {
                 if let child = root.children.first(where: { $0.name == "\(gone)" }) {
                     child.removeFromParent()
                 }
                 appModel.insertedAttachments.remove(gone)
+//                insertedAttachments.remove(gone)
             }
             
 //            logger.info("SPHERE rotate in to \(appModel.sphereAngle)")
@@ -173,10 +181,12 @@ struct ImmersiveView: View {
                     if item.pdfURL != nil {
                         logInfo("Enabling attachement \(item.title)")
                         appModel.activeAttachments = [item.title]
+//                        activeAttachments = [item.title]
                     }
                     else {
                         logInfo("No attachment for this stage, clearing activeAttachments")
                         appModel.activeAttachments = []
+//                        activeAttachments = []
                     }
                 } else {
                     // Last stage has been processed, stop all, close views which puts the
