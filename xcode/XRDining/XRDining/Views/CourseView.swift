@@ -27,6 +27,9 @@ struct CourseView: View {
             VStack  {
                 Spacer()
                 Spacer()
+                Spacer()
+                Spacer()
+                Spacer()
                 Model3D(named: modelName, bundle: realityKitContentBundle) { model in
                     if let model = model.model {
                         model
@@ -35,7 +38,11 @@ struct CourseView: View {
                     }
                 }
                 Spacer()
+                Spacer()
+                Spacer()
             }
+            Spacer()
+            Spacer()
             Spacer()
             Spacer()
         }

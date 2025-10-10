@@ -135,7 +135,7 @@ struct ImmersiveView: View {
         attachments: {
             ForEach(appModel.items.filter { $0.pdfURL != nil && !$0.modelFromBundle.isEmpty} ) { item in
                 Attachment(id: item.title) {
-                    CourseView(url: item.pdfURL!, modelName: "gebakske")
+                    CourseView(url: item.pdfURL!, modelName: item.modelFromBundle)
                     //                    .glassBackgroundEffect(      // ✅ gives you the translucent visionOS glass
                     //                        in: RoundedRectangle(cornerRadius: 24, style: .continuous)
                     //                    )
@@ -310,7 +310,7 @@ struct ImmersiveView: View {
         
         if appModel.isSingleUser {
             // TODO refactor to table-width/2 or something like that
-            position = .init(Vector3D(x: -0.5 , y: 1.0, z: appModel.screen2tableDistance-0.5))
+            position = .init(Vector3D(x: -0.5 , y: 0.7, z: appModel.screen2tableDistance-0.5))
             angle = .pi / 4
         } else {
             position = .init(Vector3D(x: 0, y: 1.0, z: appModel.screen2tableDistance-0.5))

@@ -21,7 +21,7 @@ class AppModel {
     var nrOfReferenceObjects = 0
     var currentGroupSession: GroupSession<PersonasActivity>? = nil
     
-    let modelsFromBundle = ["gebakske"]
+    let modelsFromBundle = ["gebakske","starter","dessert","main-course"]
     
     // Definition of scenes
     var items: [StageItem] = [] { didSet { if !isLoadingState { scheduleSave() } } }
